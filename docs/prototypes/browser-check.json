@@ -1,0 +1,83 @@
+{
+  "date": "2026-09-21",
+  "scope": "Browser prototypes only, not Android or processing validation",
+  "checks": [
+    {
+      "name": "a-dashboard",
+      "version": 3,
+      "settingsSheet": "pass",
+      "conversionSheet": "not-present",
+      "dimensions": [
+        {
+          "width": 390,
+          "overflow": false,
+          "searchHeights": [
+            48
+          ],
+          "mainBottom": 749,
+          "navTop": 749
+        },
+        {
+          "width": 320,
+          "overflow": false,
+          "searchHeights": [
+            48
+          ],
+          "mainBottom": 749,
+          "navTop": 749
+        }
+      ],
+      "javaScriptErrors": []
+    },
+    {
+      "name": "b-task-launcher",
+      "version": 3,
+      "settingsSheet": "pass",
+      "conversionSheet": "pass",
+      "dimensions": [
+        {
+          "width": 390,
+          "overflow": false,
+          "searchHeights": [],
+          "mainBottom": 749,
+          "navTop": 749
+        },
+        {
+          "width": 320,
+          "overflow": false,
+          "searchHeights": [],
+          "mainBottom": 749,
+          "navTop": 749
+        }
+      ],
+      "javaScriptErrors": []
+    },
+    {
+      "name": "c-file-workspace",
+      "version": 3,
+      "settingsSheet": "pass",
+      "conversionSheet": "not-present",
+      "dimensions": [
+        {
+          "width": 390,
+          "overflow": false,
+          "searchHeights": [
+            48
+          ],
+          "mainBottom": 567,
+          "navTop": 749
+        },
+        {
+          "width": 320,
+          "overflow": false,
+          "searchHeights": [
+            48
+          ],
+          "mainBottom": 567,
+          "navTop": 749
+        }
+      ],
+      "javaScriptErrors": []
+    }
+  ]
+}

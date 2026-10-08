@@ -1,0 +1,14 @@
+{
+  "results": [
+    "20 images: bounded summary, separate organizer, move 20 -> 1, return to layout",
+    "Top-layer selectors; linked/per-side numeric margins; invalid value blocked",
+    "Word selected pages subset 2,4,5 previews correct source pages; retained on edit; invalid range blocked",
+    "PDF to images uses large viewer and selected-source navigation",
+    "PDF/Excel protect and unlock: missing/mismatched/wrong passwords blocked; visible fields; no password in state",
+    "Excel unlock -> convert -> PDF lock with runtime passwords; invalid reorder blocked; replace first step with Word; remove first step",
+    "Local profile and theme selection in Settings",
+    "Layout sweep: 9 screen families x 3 palettes x 2 modes x 2 widths"
+  ],
+  "layoutFailures": [],
+  "errors": []
+}

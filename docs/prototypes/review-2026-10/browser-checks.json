@@ -1,0 +1,24 @@
+{
+  "flows": [
+    "Configure/reorder -> preview/pages -> cancel Save as -> edit retains options -> save -> Files",
+    "Catalogue search: JPEG alias and empty recovery",
+    "Pin through tool menu -> secondary Saved",
+    "Queue pause/resume/retry",
+    "Telegram multi-select and torrent seeding choice -> queue",
+    "Workflow order/compatible addition keeps encryption last",
+    "Eight reader families render",
+    "All 22 selected document tools open setup and result concepts"
+  ],
+  "layouts": [
+    {
+      "landscape": true,
+      "overflow": false
+    },
+    {
+      "largeTextProxy": true,
+      "overflow": false
+    }
+  ],
+  "icons": [],
+  "errors": []
+}

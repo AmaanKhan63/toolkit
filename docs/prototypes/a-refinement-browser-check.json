@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-05T08:49:41.704Z",
+  "kind": "Browser prototype only",
+  "checks": [
+    {
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(245, 246, 248)"
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(15, 17, 21)"
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(245, 246, 248)"
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(15, 17, 21)"
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(245, 246, 248)"
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "mainBottom": 775,
+      "navTop": 775,
+      "background": "rgb(15, 17, 21)"
+    }
+  ],
+  "errors": [],
+  "interactions": [
+    "search and empty state",
+    "favorite toggle",
+    "settings theme selection",
+    "Escape and focus return",
+    "compatible workflow reorder/add/remove",
+    "session-only save",
+    "explicitly simulated preview",
+    "preview navigation dialogs",
+    "selected catalogue",
+    "320px workflow targets and focus containment"
+  ],
+  "result": "pass"
+}

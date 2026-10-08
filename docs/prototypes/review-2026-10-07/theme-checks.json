@@ -1,0 +1,29 @@
+[
+  {
+    "family": "platinum",
+    "mode": "dark",
+    "logo": true,
+    "pageFunctions": "function",
+    "passwordFunctions": "function",
+    "flowFunctions": "function",
+    "errors": []
+  },
+  {
+    "family": "champagne",
+    "mode": "dark",
+    "logo": true,
+    "pageFunctions": "function",
+    "passwordFunctions": "function",
+    "flowFunctions": "function",
+    "errors": []
+  },
+  {
+    "family": "jade",
+    "mode": "dark",
+    "logo": true,
+    "pageFunctions": "function",
+    "passwordFunctions": "function",
+    "flowFunctions": "function",
+    "errors": []
+  }
+]

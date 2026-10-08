@@ -1,0 +1,30 @@
+[
+  {
+    "name": "main",
+    "draftId": "41479730-3489-47d2-b335-cf4b829f3717",
+    "version": 9,
+    "exportMatchesCheckedSource": true,
+    "sha256": "2c41b531ce4b1def8e92257f9791c8a95cd710266ad317386e290df583456016"
+  },
+  {
+    "name": "platinum",
+    "draftId": "9b07a303-234d-485d-af29-c3ef8d97420b",
+    "version": 2,
+    "exportMatchesCheckedSource": true,
+    "sha256": "2c41b531ce4b1def8e92257f9791c8a95cd710266ad317386e290df583456016"
+  },
+  {
+    "name": "champagne",
+    "draftId": "982a4794-fadb-4c09-b012-b3ff7cf90695",
+    "version": 2,
+    "exportMatchesCheckedSource": true,
+    "sha256": "cfcc5859f6b045f7cef1f189d381c5a6ee75cb9688d4f7aa49c628aba6ef9114"
+  },
+  {
+    "name": "jade",
+    "draftId": "d1968392-721a-4143-b8c7-0196e53744e4",
+    "version": 2,
+    "exportMatchesCheckedSource": true,
+    "sha256": "76f6e37c3541f51dcc31864d0587f6645ac7beab74759a0948c8368001e96a59"
+  }
+]

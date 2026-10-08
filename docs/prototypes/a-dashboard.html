@@ -1,0 +1,461 @@
+<!DOCTYPE html><html lang="en" class="antialiased light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toolkit - Refined Tool Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tk: {
+                            canvas: {
+                                DEFAULT: '#F5F6F8',
+                                dark: '#0F1115'
+                            },
+                            surface: {
+                                DEFAULT: '#FFFFFF',
+                                dark: '#171A20'
+                            },
+                            elevated: {
+                                DEFAULT: '#FFFFFF',
+                                dark: '#1F242C'
+                            },
+                            text: {
+                                DEFAULT: '#141922',
+                                dark: '#F2F4F8'
+                            },
+                            secondary: {
+                                DEFAULT: '#5F6978',
+                                dark: '#ADB6C5'
+                            },
+                            border: {
+                                DEFAULT: '#E2E6EE',
+                                dark: '#353D4A'
+                            },
+                            accent: {
+                                DEFAULT: '#245BDD',
+                                dark: '#8CAEFF'
+                            },
+                            'accent-tint': {
+                                DEFAULT: '#EAF0FF',
+                                dark: '#202E4C'
+                            },
+                            success: {
+                                DEFAULT: '#217047',
+                                dark: '#88D4AC'
+                            },
+                            error: {
+                                DEFAULT: '#B42332',
+                                dark: '#FF9EA8'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    },
+                    borderRadius: {
+                        card: '16px',
+                        btn: '12px',
+                        input: '12px',
+                        pill: '9999px',
+                    },
+                    boxShadow: {
+                        soft: '0 3px 14px rgba(20,25,34,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+        
+        button, input { min-height: 48px; }
+        .icon-btn { min-width: 48px; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
+        
+        .sheet-enter { transform: translateY(100%); }
+        .sheet-enter-active { transform: translateY(0); transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .sheet-exit { transform: translateY(0); }
+        .sheet-exit-active { transform: translateY(100%); transition: transform 200ms cubic-bezier(0.4, 0, 1, 1); }
+
+        .overlay-enter { opacity: 0; }
+        .overlay-enter-active { opacity: 1; transition: opacity 250ms ease; }
+        .overlay-exit { opacity: 1; }
+        .overlay-exit-active { opacity: 0; transition: opacity 200ms ease; }
+
+        #app { --surface:#fff;--canvas:#F5F6F8;--text:#141922;--muted:#5F6978;--border:#E2E6EE;--accent:#245BDD;--tint:#EAF0FF; height:100dvh; }
+        .dark #app { --surface:#171A20;--canvas:#0F1115;--text:#F2F4F8;--muted:#ADB6C5;--border:#353D4A;--accent:#8CAEFF;--tint:#202E4C; color-scheme:dark; }
+        button,select { touch-action:manipulation; }
+        button:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--accent);outline-offset:3px; }
+        button:disabled { opacity:.42;cursor:default; }
+        [hidden] { display:none !important; }
+        .muted { color:var(--muted);font-size:13px;line-height:20px; }
+        .demo-button,select { min-height:48px;border:1px solid var(--border);border-radius:12px;padding:8px 12px;background:var(--surface);color:var(--text);font-size:14px; }
+        .demo-button[aria-pressed="true"] { background:var(--tint);color:var(--accent);border-color:var(--accent); }
+        .workflow-body { flex:1;min-height:0;overflow-y:auto;padding:16px 20px; }
+        .workflow-step { display:flex;gap:12px;margin:16px 0; }
+        .step-number { width:32px;height:32px;border-radius:50%;background:var(--tint);color:var(--accent);display:grid;place-items:center;flex-shrink:0;font-size:13px; }
+        .step-card { min-width:0;flex:1;background:var(--canvas);border:1px solid var(--border);border-radius:16px;padding:12px; }
+        .step-card h3 { font-size:15px;font-weight:600;margin-bottom:8px; }
+        .step-card select { width:100%;font-size:13px; }
+        .step-actions { display:flex;justify-content:flex-end;margin-top:8px; }
+        .step-actions button { width:48px;height:48px;display:grid;place-items:center;color:var(--muted);border-radius:12px; }
+        .add-row { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+        .add-row label { flex-basis:100%;font-size:14px;font-weight:600; }
+        .add-row select { flex:1;min-width:0; }
+        #workflow-status { margin-top:16px; }
+        #demo-dialog { border:0;border-radius:20px;margin:auto;width:calc(100% - 32px);max-width:440px;max-height:85dvh;padding:24px;background:var(--surface);color:var(--text);overflow:auto; }
+        #demo-dialog::backdrop { background:rgba(20,25,34,.4); }
+        #demo-dialog h2 { font-size:20px;font-weight:600; }
+        #demo-dialog p { margin:16px 0; }
+        #demo-content .demo-button { display:block;width:100%;text-align:left;margin-top:8px; }
+        .favorite-row { display:flex;align-items:center;gap:8px; }
+        .favorite-row > button:first-child { flex:1;min-width:0; }
+        .favorite-row > button:last-child { flex-shrink:0; }
+        #no-results { padding:16px 0; }
+        header { padding-top:max(12px,env(safe-area-inset-top)); }
+        footer { padding-bottom:max(8px,env(safe-area-inset-bottom)); }
+        @media(min-width:600px) { #app { max-width:480px;margin:auto; } #settings-overlay > div,#workflow-overlay > div { max-width:480px;left:50%;margin-left:-240px; } body {background:#E2E6EE;} }
+    </style>
+</head>
+<body>
+    
+    <div id="app" class="bg-tk-canvas dark:bg-tk-canvas-dark text-tk-text dark:text-tk-text-dark font-sans transition-colors duration-200 w-full flex flex-col relative" data-sd-id="1">
+        
+        <!-- Top App Bar -->
+        <header class="shrink-0 pt-[12px] px-[20px] pb-[12px] flex items-center justify-between bg-tk-canvas dark:bg-tk-canvas-dark z-10 sticky top-0" data-sd-id="2">
+            <h1 class="text-[28px] leading-[34px] font-semibold tracking-tight" data-sd-id="3">Toolkit</h1>
+            <div class="flex items-center gap-[8px]" data-sd-id="top-actions">
+                <button id="theme-toggle" class="icon-btn rounded-pill hover:bg-tk-border/50 dark:hover:bg-tk-border-dark/50 transition-colors focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" aria-label="Toggle theme">
+                    <iconify-icon icon="lucide:sun" class="text-2xl hidden dark:block text-tk-secondary-dark"></iconify-icon>
+                    <iconify-icon icon="lucide:moon" class="text-2xl block dark:hidden text-tk-secondary"></iconify-icon>
+                </button>
+                <button id="settings-btn" class="icon-btn rounded-pill hover:bg-tk-border/50 dark:hover:bg-tk-border-dark/50 transition-colors focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" aria-label="Settings">
+                    <iconify-icon icon="lucide:settings" class="text-2xl text-tk-secondary dark:text-tk-secondary-dark"></iconify-icon>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Scrollable Content -->
+        <main class="flex-1 overflow-y-auto px-[20px] pb-[24px] min-h-0 relative" data-sd-id="5">
+            
+            <!-- Search -->
+            <div class="relative mb-[24px]" data-sd-id="8">
+                <div class="absolute inset-y-0 left-0 pl-[16px] flex items-center pointer-events-none" data-sd-id="9">
+                    <iconify-icon icon="lucide:search" class="text-tk-secondary dark:text-tk-secondary-dark text-[20px]"></iconify-icon>
+                </div>
+                <input aria-label="Search tools" type="text" placeholder="Search tools..." class="w-full h-[48px] pl-[44px] pr-[16px] rounded-input border border-tk-border dark:border-tk-border-dark bg-tk-surface dark:bg-tk-surface-dark text-[15px] placeholder-tk-secondary dark:placeholder-tk-secondary-dark focus:outline-none focus:border-tk-accent dark:focus:border-tk-accent-dark focus:ring-1 focus:ring-tk-accent dark:focus:ring-tk-accent-dark transition-all" data-sd-id="10">
+            </div>
+
+            <!-- Recent 2x2 Grid -->
+            <section class="mb-[24px]" data-sd-id="11">
+                <h2 class="text-[15px] font-semibold mb-[12px]" data-sd-id="12">Recent</h2>
+                <div class="grid grid-cols-2 gap-[12px]" data-sd-id="13">
+                    
+                    <!-- Tool Card 1 -->
+                    <button class="flex flex-col items-start p-[16px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card shadow-soft dark:shadow-none active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" data-sd-id="14">
+                        <iconify-icon icon="lucide:image" class="text-[22px] text-tk-accent dark:text-tk-accent-dark mb-[12px]"></iconify-icon>
+                        <span class="font-medium text-[15px] leading-[22px]" data-sd-id="16">Images to PDF</span>
+                    </button>
+
+                    <!-- Tool Card 2 -->
+                    <button class="flex flex-col items-start p-[16px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card shadow-soft dark:shadow-none active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" data-sd-id="18">
+                        <iconify-icon icon="lucide:layers" class="text-[22px] text-tk-accent dark:text-tk-accent-dark mb-[12px]"></iconify-icon>
+                        <span class="font-medium text-[15px] leading-[22px]" data-sd-id="20">Merge PDF</span>
+                    </button>
+
+                    <!-- Tool Card 3 -->
+                    <button class="flex flex-col items-start p-[16px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card shadow-soft dark:shadow-none active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" data-sd-id="22">
+                        <iconify-icon icon="lucide:minimize-2" class="text-[22px] text-tk-accent dark:text-tk-accent-dark mb-[12px]"></iconify-icon>
+                        <span class="font-medium text-[15px] leading-[22px]" data-sd-id="24">Compress PDF</span>
+                    </button>
+
+                    <!-- Tool Card 4 -->
+                    <button class="flex flex-col items-start p-[16px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card shadow-soft dark:shadow-none active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark" data-sd-id="26">
+                        <iconify-icon icon="lucide:lock" class="text-[22px] text-tk-accent dark:text-tk-accent-dark mb-[12px]"></iconify-icon>
+                        <span class="font-medium text-[15px] leading-[22px]" data-sd-id="28">Lock / unlock</span>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- Favorites -->
+            <section class="mb-[24px]" data-sd-id="fav-section">
+                <h2 class="text-[15px] font-semibold mb-[12px]">Favorites</h2>
+                <div class="flex flex-col gap-[8px]">
+                    <button class="w-full flex items-center px-[16px] py-[12px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark text-left">
+                        <iconify-icon icon="lucide:scan" class="text-[20px] text-tk-secondary dark:text-tk-secondary-dark mr-[16px] shrink-0"></iconify-icon>
+                        <span class="flex-1 font-medium text-[15px]">Scan to PDF</span>
+                        <iconify-icon icon="lucide:star" class="text-[18px] text-tk-accent dark:text-tk-accent-dark shrink-0"></iconify-icon>
+                    </button>
+                    <button class="w-full flex items-center px-[16px] py-[12px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark text-left">
+                        <iconify-icon icon="lucide:file-spreadsheet" class="text-[20px] text-tk-secondary dark:text-tk-secondary-dark mr-[16px] shrink-0"></iconify-icon>
+                        <span class="flex-1 font-medium text-[15px]">Excel protection</span>
+                        <iconify-icon icon="lucide:star" class="text-[18px] text-tk-accent dark:text-tk-accent-dark shrink-0"></iconify-icon>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Workflows Entry -->
+            <section class="mb-[32px]">
+                 <h2 class="text-[15px] font-semibold mb-[12px]">Workflows</h2>
+                 <button id="workflow-entry-btn" class="w-full flex flex-col p-[16px] bg-tk-surface dark:bg-tk-surface-dark border border-tk-border dark:border-tk-border-dark rounded-card shadow-soft dark:shadow-none active:bg-tk-canvas dark:active:bg-tk-canvas-dark transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-accent dark:focus:ring-tk-accent-dark">
+                     <div class="flex items-center justify-between w-full mb-[8px]">
+                         <div class="flex items-center gap-[8px]">
+                             <div class="w-[32px] h-[32px] rounded-pill bg-tk-accent-tint dark:bg-tk-accent-tint-dark flex items-center justify-center">
+                                 <iconify-icon icon="lucide:git-merge" class="text-[16px] text-tk-accent dark:text-tk-accent-dark"></iconify-icon>
+                             </div>
+                             <span class="font-medium text-[15px]">Prepare document</span>
+                         </div>
+                         <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary dark:text-tk-secondary-dark text-xl"></iconify-icon>
+                     </div>
+                     <div class="text-[13px] text-tk-secondary dark:text-tk-secondary-dark flex flex-wrap items-center gap-[4px]">
+                         <span>Images to PDF</span>
+                         <iconify-icon icon="lucide:arrow-right" class="text-[12px]"></iconify-icon>
+                         <span>Watermark</span>
+                         <iconify-icon icon="lucide:arrow-right" class="text-[12px]"></iconify-icon>
+                         <span>Compress</span><iconify-icon icon="lucide:arrow-right" class="text-[12px]"></iconify-icon><span>Lock</span>
+                     </div>
+                 </button>
+            </section>
+
+            <button id="browse-tools" class="demo-button" style="width:100%;margin-bottom:24px">Browse all tools</button>
+            <!-- Prototype Notice -->
+            <div class="text-center pb-[24px]" data-sd-id="59">
+                 <span class="inline-block px-[12px] py-[4px] border border-tk-border dark:border-tk-border-dark text-[12px] font-mono text-tk-secondary dark:text-tk-secondary-dark rounded-pill" data-sd-id="60">
+                     Demo · Sample data
+                 </span>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <footer class="shrink-0 bg-tk-surface dark:bg-tk-surface-dark border-t border-tk-border dark:border-tk-border-dark pb-[8px] z-40 w-full" data-sd-id="61">
+            <nav class="flex justify-around items-center h-[60px] px-[8px]" data-sd-id="62">
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-accent dark:text-tk-accent-dark focus:outline-none" data-sd-id="63">
+                    <div class="mb-[4px] relative">
+                        <iconify-icon icon="lucide:grid" class="text-[24px]"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="65">Tools</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-secondary dark:text-tk-secondary-dark hover:text-tk-text dark:hover:text-tk-text-dark transition-colors focus:outline-none" data-sd-id="66">
+                    <div class="mb-[4px]">
+                        <iconify-icon icon="lucide:download" class="text-[24px]"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="68">Downloads</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-secondary dark:text-tk-secondary-dark hover:text-tk-text dark:hover:text-tk-text-dark transition-colors focus:outline-none" data-sd-id="69">
+                    <div class="mb-[4px]">
+                        <iconify-icon icon="lucide:folder" class="text-[24px]"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="71">Files</span>
+                </button>
+            </nav>
+        </footer>
+
+        <!-- Settings Overlay -->
+        <div id="settings-overlay" class="fixed inset-0 bg-tk-text/40 dark:bg-black/60 z-50 hidden opacity-0 transition-opacity duration-200">
+            <div class="absolute bottom-0 w-full bg-tk-surface dark:bg-tk-elevated-dark rounded-t-2xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[90vh]">
+                <div class="w-full flex justify-center pt-[12px] pb-[8px]">
+                    <div class="w-[40px] h-[4px] bg-tk-border dark:bg-tk-border-dark rounded-pill"></div>
+                </div>
+                <div class="px-[20px] pb-[16px] flex items-center justify-between border-b border-tk-border dark:border-tk-border-dark">
+                    <h2 class="text-[18px] font-semibold">Settings</h2>
+                    <button id="close-settings" aria-label="Close settings" class="icon-btn -mr-[8px] text-tk-secondary dark:text-tk-secondary-dark">
+                        <iconify-icon icon="lucide:x" class="text-[24px]"></iconify-icon>
+                    </button>
+                </div>
+                <div class="overflow-y-auto px-[20px] py-[24px] flex-1 space-y-[24px]">
+                    <div>
+                        <div class="font-medium text-[14px] mb-[8px]">Theme Preference</div>
+                        <div class="flex gap-[8px]">
+                            <button class="flex-1 py-10 border border-tk-accent dark:border-tk-border-dark rounded-btn bg-tk-accent-tint dark:bg-tk-surface-dark text-[14px] font-medium text-tk-accent dark:text-tk-text-dark">Light</button>
+                            <button class="flex-1 py-10 border border-tk-border dark:border-tk-border-dark rounded-btn bg-tk-surface dark:bg-tk-surface-dark text-[14px]">System</button>
+                            <button class="flex-1 py-10 border border-tk-border dark:border-tk-accent-dark rounded-btn bg-tk-surface dark:bg-tk-accent-tint-dark text-[14px] text-tk-text dark:text-tk-accent-dark font-medium hidden dark:block">Dark</button>
+                            <button class="flex-1 py-10 border border-tk-border dark:border-tk-border-dark rounded-btn bg-tk-surface dark:bg-tk-surface-dark text-[14px] block dark:hidden">Dark</button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="font-medium text-[14px] mb-[8px]">Output Folder</div>
+                        <button class="w-full flex items-center justify-between p-[12px] border border-tk-border dark:border-tk-border-dark rounded-btn bg-tk-canvas dark:bg-tk-canvas-dark">
+                            <div class="flex items-center gap-[12px] overflow-hidden">
+                                <iconify-icon icon="lucide:folder" class="text-tk-secondary dark:text-tk-secondary-dark shrink-0 text-[18px]"></iconify-icon>
+                                <span class="font-mono text-[13px] truncate">/Downloads/Toolkit</span>
+                            </div>
+                            <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary dark:text-tk-secondary-dark shrink-0"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Sheet -->
+        <div id="workflow-overlay" class="fixed inset-0 bg-tk-text/40 dark:bg-black/60 z-50 hidden opacity-0 transition-opacity duration-200">
+            <div class="absolute bottom-0 w-full h-[95vh] bg-tk-surface dark:bg-tk-elevated-dark rounded-t-2xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col">
+                <div class="w-full flex justify-center pt-[12px] pb-[8px]">
+                    <div class="w-[40px] h-[4px] bg-tk-border dark:bg-tk-border-dark rounded-pill"></div>
+                </div>
+                <div class="px-[20px] pb-[16px] flex items-center justify-between border-b border-tk-border dark:border-tk-border-dark">
+                    <div class="flex flex-col">
+                        <h2 class="text-[18px] font-semibold">Prepare document</h2>
+                        <span id="step-count" class="text-[13px] text-tk-secondary dark:text-tk-secondary-dark">4 steps • Local processing</span>
+                    </div>
+                    <button id="close-workflow" aria-label="Close workflow" class="icon-btn -mr-[8px] text-tk-secondary dark:text-tk-secondary-dark">
+                        <iconify-icon icon="lucide:x" class="text-[24px]"></iconify-icon>
+                    </button>
+                </div>
+                
+<div class="workflow-body"><p class="muted">Build a reusable sequence. This preview uses sample data only.</p><div id="workflow-steps"></div><div class="add-row"><label for="step-choice">Add a step</label><select id="step-choice"><option value="numbers">Page numbers</option><option value="watermark">Watermark</option><option value="compress">Compress PDF</option><option value="lock">Lock PDF</option></select><button id="add-step" class="demo-button">Add</button></div><p id="workflow-status" class="muted" role="status" aria-live="polite"></p></div>
+                <div class="p-[20px] border-t border-tk-border dark:border-tk-border-dark bg-tk-surface dark:bg-tk-elevated-dark pb-[20px]">
+                    <div class="flex gap-[12px]">
+                        <button class="flex-1 py-[12px] bg-tk-canvas dark:bg-tk-canvas-dark border border-tk-border dark:border-tk-border-dark text-tk-text dark:text-tk-text-dark rounded-btn font-medium text-[15px]" id="save-workflow">Save demo</button>
+                        <button class="flex-[2] py-[12px] bg-tk-accent text-white rounded-btn font-medium text-[15px]" id="preview-workflow">Preview run</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <dialog id="demo-dialog" aria-labelledby="demo-title"><div class="flex items-center justify-between"><h2 id="demo-title"></h2><button id="close-demo" class="icon-btn" aria-label="Close preview"><iconify-icon icon="lucide:x"></iconify-icon></button></div><div id="demo-content"></div></dialog>
+    </div>
+
+    <script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const html = document.documentElement;
+const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+let theme = 'light';
+function setTheme(value) {
+    theme = value;
+    const dark = value === 'dark' || (value === 'system' && systemTheme.matches);
+    html.classList.toggle('dark', dark);
+    html.classList.toggle('light', !dark);
+    $$('[data-theme]').forEach(b => b.setAttribute('aria-pressed',b.dataset.theme === value));
+    $('#theme-toggle').setAttribute('aria-label',dark ? 'Switch to light theme' : 'Switch to dark theme');
+}
+$('#theme-toggle').onclick = () => setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+systemTheme.addEventListener('change',()=>{if(theme==='system')setTheme('system');});
+const themeContainer = $('#settings-overlay .flex.gap-\\[8px\\]');
+themeContainer.replaceChildren(...['Light','System','Dark'].map(label => {
+    const b = document.createElement('button');b.className='demo-button flex-1';b.dataset.theme=label.toLowerCase();b.textContent=label;b.onclick=()=>setTheme(b.dataset.theme);return b;
+}));
+setTheme('light');
+let activeSheet = null;
+function setupSheet(button, overlayId, closeId) {
+    const overlay = $(overlayId), sheet = overlay.firstElementChild, opener = $(button), closeButton = $(closeId);
+    sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label',overlayId.includes('workflow')?'Workflow builder':'Settings');
+    const background = $$('header,main,footer');
+    function close() {
+        overlay.classList.add('hidden','opacity-0');sheet.classList.add('translate-y-full');
+        background.forEach(n=>n.inert=false);activeSheet=null;opener.focus();
+    }
+    opener.onclick=()=>{
+        overlay.classList.remove('hidden','opacity-0');sheet.classList.remove('translate-y-full');
+        background.forEach(n=>n.inert=true);activeSheet={sheet,close};closeButton.focus();
+    };
+    closeButton.onclick=close;overlay.onclick=e=>{if(e.target===overlay)close();};
+}
+setupSheet('#settings-btn','#settings-overlay','#close-settings');
+setupSheet('#workflow-entry-btn','#workflow-overlay','#close-workflow');
+document.addEventListener('keydown', e => {
+    if(!activeSheet || $('#demo-dialog').open)return;
+    if(e.key==='Escape'){e.preventDefault();activeSheet.close();return;}
+    if(e.key==='Tab'){
+        const nodes = [...activeSheet.sheet.querySelectorAll('button:not(:disabled),select,input')].filter(n=>n.getClientRects().length);
+        const first=nodes[0],last=nodes[nodes.length-1];
+        if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();}
+        else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();}
+    }
+});
+const dialog=$('#demo-dialog');
+function showDemo(title, text) {
+    $('#demo-title').textContent=title;$('#demo-content').replaceChildren();
+    const p=document.createElement('p');p.className='muted';p.textContent=text;$('#demo-content').append(p);
+    dialog.showModal();
+}
+$('#close-demo').onclick=()=>dialog.close();
+dialog.onclick=e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}};
+const search = $('input[type="text"]');
+const searchable = $$('[data-sd-id="13"] > button,[data-sd-id="fav-section"] > div > button');
+searchable.forEach(button=>{
+    const label=button.querySelector('span').textContent;
+    button.dataset.search=label.toLowerCase();button.onclick=()=>showDemo(label,'Tool preview. In the Android app, choose files, adjust options, then save a new output. This prototype does not open or process files.');
+});
+$$('[data-sd-id="fav-section"] > div > button').forEach(button=>{
+    button.querySelector('iconify-icon:last-child').remove();
+    const row=document.createElement('div');row.className='favorite-row';
+    button.before(row);row.append(button);
+    const pin=document.createElement('button');pin.className='demo-button icon-btn';pin.setAttribute('aria-pressed','true');
+    const label=button.querySelector('span').textContent;
+    function update(){const pinned=pin.getAttribute('aria-pressed')==='true';pin.setAttribute('aria-label',(pinned?'Unpin ':'Pin ')+label);pin.innerHTML='<iconify-icon icon="lucide:'+(pinned?'star':'plus')+'"></iconify-icon>';}
+    pin.onclick=()=>{pin.setAttribute('aria-pressed',pin.getAttribute('aria-pressed')!=='true');update();};update();row.append(pin);
+});
+const empty=document.createElement('p');empty.id='no-results';empty.className='muted';empty.textContent='No matching tools in Recent or Favorites. Browse all tools below.';empty.hidden=true;search.parentElement.after(empty);
+search.oninput=()=>{
+    const query=search.value.trim().toLowerCase();let matches=0;
+    searchable.forEach(b=>{const visible=b.dataset.search.includes(query);(b.closest('.favorite-row')||b).hidden=!visible;if(visible)matches++;});empty.hidden=matches>0;
+};
+$$('nav button').forEach((button,index)=>button.onclick=()=>{
+    if(index===0){search.value='';search.oninput();$('main').scrollTop=0;return;}
+    showDemo(index===1?'Downloads':'Files', index===1?'Preview only. Download modes: Video link (yt-dlp), Direct file (aria2), Telegram, and Torrent / magnet. The Android flow will offer quality, destination and a download queue.':'Preview only. Open PDF, Office documents, Markdown, text and structured text, EPUB, or local HTML. No device files are accessed here.');
+});
+$('#settings-overlay button.w-full').onclick=()=>showDemo('Output folder','Sample destination: Downloads / Toolkit. The Android app will use the system folder picker. No folder permission is requested by this preview.');
+const catalogue = ['Images to PDF','Merge PDF','PDF lock / unlock','Excel protection','Compress PDF','Word to PDF','Excel to PDF','Presentation to PDF','PDF to Word','PDF to Excel','PDF to presentation','PDF to images','HTML to PDF','Split / extract pages','Reorder / rotate / delete pages','Crop pages','Watermark / page numbers','Scan to PDF','Draw / place signature','PDF to TXT / Markdown','TXT / Markdown to PDF','Document metadata','Saved workflows'];
+$('#browse-tools').onclick=()=>{
+    showDemo('Document tools','Selected document tools. Downloaders and viewers are available from their tabs. These are preview entries.');
+    catalogue.forEach(label=>{const b=document.createElement('button');b.className='demo-button';b.textContent=label;b.onclick=()=>{dialog.close();if(label==='Saved workflows')$('#workflow-entry-btn').click();else showDemo(label,'Selected for Toolkit. File selection and processing will be added to the Android app after design review.');};$('#demo-content').append(b);});
+};
+const definitions = {
+    images:{name:'Images to PDF',options:['A4 · Portrait · Fit','A4 · Landscape · Fit','Original image size']},
+    watermark:{name:'Watermark',options:['DRAFT · Center','COPY · Center','CONFIDENTIAL · Bottom']},
+    compress:{name:'Compress PDF',options:['Balanced quality','Higher quality','Smaller file']},
+    numbers:{name:'Page numbers',options:['Bottom right','Bottom center','Top right']},
+    lock:{name:'Lock PDF',options:['Ask for password when running']}
+};
+let steps=['images','watermark','compress','lock'].map((type,i)=>({id:i+1,type,option:0}));let nextId=5;let savedTemplate=null;
+function renderSteps(focusId){
+    const list=$('#workflow-steps');list.replaceChildren();
+    $('#step-count').textContent=steps.length+' steps · Demo workflow';
+    steps.forEach((step,index)=>{
+        const def=definitions[step.type],row=document.createElement('div');row.className='workflow-step';row.dataset.type=step.type;
+        const number=document.createElement('span');number.className='step-number';number.textContent=index+1;row.append(number);
+        const card=document.createElement('div');card.className='step-card';const title=document.createElement('h3');title.textContent=def.name;card.append(title);
+        const select=document.createElement('select');select.id='options-'+step.id;select.setAttribute('aria-label',def.name+' options');
+        def.options.forEach((label,i)=>select.add(new Option(label,i)));select.value=step.option;select.onchange=()=>{step.option=Number(select.value);$('#workflow-status').textContent='Options changed. Save demo to keep this template for the current page session.';};card.append(select);
+        if(step.type!=='images'){
+            const actions=document.createElement('div');actions.className='step-actions';
+            [['up','Move up','arrow-up'],['down','Move down','arrow-down'],['remove','Remove','trash-2']].forEach(([action,label,icon])=>{
+                const b=document.createElement('button');b.id=action+'-'+step.id;b.setAttribute('aria-label',label+' '+def.name);b.innerHTML='<iconify-icon icon="lucide:'+icon+'"></iconify-icon>';
+                b.disabled=action==='up'?(index<=1||step.type==='lock'):action==='down'?(index>=steps.length-1||step.type==='lock'||steps[index+1]?.type==='lock'):false;
+                b.onclick=()=>{if(action==='remove')steps.splice(index,1);else{const other=index+(action==='up'?-1:1);[steps[index],steps[other]]=[steps[other],steps[index]];}renderSteps(action==='remove'?'step-choice':'options-'+step.id);$('#workflow-status').textContent='Sequence updated. Images come first; password protection stays last.';};actions.append(b);
+            });card.append(actions);
+        }
+        row.append(card);list.append(row);
+    });
+    $$('#step-choice option').forEach(option=>option.disabled=steps.some(step=>step.type===option.value));
+    const available=$$('#step-choice option').find(o=>!o.disabled);$('#step-choice').disabled=!available;$('#add-step').disabled=!available;if(available)$('#step-choice').value=available.value;
+    if(focusId)document.getElementById(focusId)?.focus();
+}
+$('#add-step').onclick=()=>{const type=$('#step-choice').value;if(steps.some(s=>s.type===type))return;const step={id:nextId++,type,option:0};const lock=steps.findIndex(s=>s.type==='lock');steps.splice(lock<0?steps.length:lock,0,step);renderSteps('options-'+step.id);$('#workflow-status').textContent='Step added before password protection.';};
+$('#save-workflow').onclick=()=>{savedTemplate=steps.map(s=>({...s}));$('#workflow-status').textContent='Demo template saved for this page session ('+savedTemplate.length+' steps). No files or passwords stored.';};
+$('#preview-workflow').onclick=()=>{$('#workflow-status').textContent='Simulated preview: sample images → '+steps.map(s=>definitions[s.type].name).join(' → ')+' → choose output folder. No files were created.';$('#workflow-status').scrollIntoView({block:'nearest'});};
+renderSteps();
+$$('iconify-icon').forEach(n=>n.setAttribute('aria-hidden','true'));
+
+    </script>
+
+</body>
+</html>
