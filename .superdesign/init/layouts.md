@@ -1,0 +1,348 @@
+# Prototype shell
+Source: docs/prototypes/a-dashboard.html. No separate shared layout file exists. Complete selected prototype source follows; B/C are historical alternatives using the same shell. No application code is implied.
+```html
+<!DOCTYPE html><html lang="en" class="antialiased"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toolkit - Tool Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=space-grotesk@400,500,600,700&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tk-canvas-light': '#F7F7F5',
+                        'tk-surface-light': '#FFFFFF',
+                        'tk-text-light': '#18251E',
+                        'tk-secondary-light': '#58635C',
+                        'tk-border-light': '#D9DFD9',
+                        'tk-primary': '#1A3C2B',
+                        'tk-on-primary': '#FFFFFF',
+                        'tk-primary-container': '#E4EEE6',
+                        'tk-cat-docs': '#E4EEE6',
+                        'tk-cat-dl': '#F7EDC8',
+                        'tk-cat-files': '#F9E2D8',
+                    },
+                    fontFamily: {
+                        'display': ['Space Grotesk', 'sans-serif'],
+                        'body': ['system-ui', '-apple-system', 'sans-serif'],
+                        'mono': ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    },
+                    spacing: {
+                        '0': '0',
+                        '4': '4px',
+                        '8': '8px',
+                        '12': '12px',
+                        '16': '16px',
+                        '20': '20px',
+                        '24': '24px',
+                        '32': '32px',
+                    },
+                    borderRadius: {
+                        'tk-card': '16px',
+                        'tk-btn': '12px',
+                        'tk-input': '12px',
+                        'tk-pill': '9999px',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar to hide it but keep functionality */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* View Transitions */
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 200ms;
+        }
+        
+        .sheet-enter {
+            transform: translateY(100%);
+        }
+        .sheet-enter-active {
+            transform: translateY(0);
+            transition: transform 220ms ease-out;
+        }
+        .sheet-exit {
+            transform: translateY(0);
+        }
+        .sheet-exit-active {
+            transform: translateY(100%);
+            transition: transform 150ms ease-in;
+        }
+    button { min-height: 48px; min-width: 48px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+main { min-height: 0; }
+main > div { flex-shrink: 0; }
+footer { position: relative !important; bottom: auto !important; }
+</style>
+</head>
+<body>
+    
+    <div class="bg-tk-canvas-light text-tk-text-light font-body w-full h-screen overflow-hidden w-full h-screen flex flex-col relative" data-sd-id="1">
+        
+        <!-- Top App Bar -->
+        <header class="shrink-0 pt-14 px-20 pb-16 flex items-center justify-between bg-tk-canvas-light z-10 sticky top-0" data-sd-id="2">
+            <h1 class="font-display font-semibold text-[28px] leading-[34px] tracking-tight" data-sd-id="3">Toolkit</h1>
+            <button id="settings-btn" class="w-[48px] h-[48px] flex items-center justify-center rounded-tk-pill hover:bg-tk-border-light/50 transition-colors focus:ring-2 focus:ring-tk-primary outline-none" aria-label="Settings" data-sd-id="4">
+                <iconify-icon icon="lucide:settings" class="text-2xl"></iconify-icon>
+            </button>
+        </header>
+
+        <!-- Main Scrollable Content -->
+        <main class="flex-1 overflow-y-auto px-20 pb-32 relative" data-sd-id="5">
+            
+            <!-- Page Title -->
+            <div class="mb-24" data-sd-id="6">
+                <h2 class="text-[18px] leading-[24px] font-medium text-tk-secondary-light" data-sd-id="7">Your everyday tools</h2>
+            </div>
+
+            <!-- Search -->
+            <div class="relative mb-32" data-sd-id="8">
+                <div class="absolute inset-y-0 left-0 pl-12 flex items-center pointer-events-none" data-sd-id="9">
+                    <iconify-icon icon="lucide:search" class="text-tk-secondary-light text-xl"></iconify-icon>
+                </div>
+                <input aria-label="Search files or tools" type="text" placeholder="Search tasks or files..." class="w-full h-[48px] pl-[44px] pr-12 rounded-tk-input border border-tk-border-light bg-tk-surface-light text-[16px] placeholder-tk-secondary-light focus:outline-none focus:border-tk-primary focus:ring-1 focus:ring-tk-primary transition-all" data-sd-id="10">
+            </div>
+
+            <!-- Favorites 2x2 Grid -->
+            <section class="mb-32" data-sd-id="11">
+                <h3 class="text-[13px] font-medium text-tk-secondary-light uppercase tracking-wider mb-16" data-sd-id="12">Favorites</h3>
+                <div class="grid grid-cols-2 gap-12" data-sd-id="13">
+                    
+                    <!-- Tool Card 1 -->
+                    <button id="tool-img-pdf" class="flex flex-col items-start p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="14">
+                        <div class="w-[48px] h-[48px] rounded-tk-pill bg-tk-cat-docs flex items-center justify-center mb-12 text-tk-text-light" data-sd-id="15">
+                            <iconify-icon icon="lucide:image" class="text-xl"></iconify-icon>
+                        </div>
+                        <span class="font-medium text-[16px] leading-[24px]" data-sd-id="16">Images to PDF</span>
+                        <span class="text-[13px] text-tk-secondary-light mt-4" data-sd-id="17">Convert &amp; arrange</span>
+                    </button>
+
+                    <!-- Tool Card 2 -->
+                    <button class="flex flex-col items-start p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="18">
+                        <div class="w-[48px] h-[48px] rounded-tk-pill bg-tk-cat-docs flex items-center justify-center mb-12 text-tk-text-light" data-sd-id="19">
+                            <iconify-icon icon="lucide:layers" class="text-xl"></iconify-icon>
+                        </div>
+                        <span class="font-medium text-[16px] leading-[24px]" data-sd-id="20">Merge PDF</span>
+                        <span class="text-[13px] text-tk-secondary-light mt-4" data-sd-id="21">Combine files</span>
+                    </button>
+
+                    <!-- Tool Card 3 -->
+                    <button class="flex flex-col items-start p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="22">
+                        <div class="w-[48px] h-[48px] rounded-tk-pill bg-tk-cat-docs flex items-center justify-center mb-12 text-tk-text-light" data-sd-id="23">
+                            <iconify-icon icon="lucide:minimize-2" class="text-xl"></iconify-icon>
+                        </div>
+                        <span class="font-medium text-[16px] leading-[24px]" data-sd-id="24">Compress PDF</span>
+                        <span class="text-[13px] text-tk-secondary-light mt-4" data-sd-id="25">Reduce file size</span>
+                    </button>
+
+                    <!-- Tool Card 4 -->
+                    <button class="flex flex-col items-start p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors text-left focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="26">
+                        <div class="w-[48px] h-[48px] rounded-tk-pill bg-tk-cat-docs flex items-center justify-center mb-12 text-tk-text-light" data-sd-id="27">
+                            <iconify-icon icon="lucide:lock" class="text-xl"></iconify-icon>
+                        </div>
+                        <span class="font-medium text-[16px] leading-[24px]" data-sd-id="28">Lock / unlock</span>
+                        <span class="text-[13px] text-tk-secondary-light mt-4" data-sd-id="29">Manage passwords</span>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- Categories -->
+            <section class="mb-32" data-sd-id="30">
+                <h3 class="text-[13px] font-medium text-tk-secondary-light uppercase tracking-wider mb-16" data-sd-id="31">Explore</h3>
+                <div class="flex flex-col gap-12" data-sd-id="32">
+                    
+                    <button class="w-full flex items-center p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="33">
+                        <div class="w-10 h-10 rounded-tk-pill bg-tk-cat-docs flex items-center justify-center mr-16 text-tk-text-light shrink-0" data-sd-id="34">
+                            <iconify-icon icon="lucide:file-text" class="text-lg"></iconify-icon>
+                        </div>
+                        <div class="flex-1 text-left" data-sd-id="35">
+                            <div class="font-medium text-[16px] leading-[24px]" data-sd-id="36">Documents</div>
+                            <div class="text-[13px] text-tk-secondary-light" data-sd-id="37">Local PDF &amp; text utilities</div>
+                        </div>
+                        <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary-light text-xl"></iconify-icon>
+                    </button>
+
+                    <button class="w-full flex items-center p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="38">
+                        <div class="w-10 h-10 rounded-tk-pill bg-tk-cat-dl flex items-center justify-center mr-16 text-tk-text-light shrink-0" data-sd-id="39">
+                            <iconify-icon icon="lucide:download-cloud" class="text-lg"></iconify-icon>
+                        </div>
+                        <div class="flex-1 text-left" data-sd-id="40">
+                            <div class="font-medium text-[16px] leading-[24px]" data-sd-id="41">Downloads</div>
+                            <div class="text-[13px] text-tk-secondary-light" data-sd-id="42">Fetch from links</div>
+                        </div>
+                        <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary-light text-xl"></iconify-icon>
+                    </button>
+
+                    <button class="w-full flex items-center p-16 bg-tk-surface-light border border-tk-border-light rounded-tk-card active:bg-tk-canvas-light transition-colors focus:outline-none focus:ring-2 focus:ring-tk-primary" data-sd-id="43">
+                        <div class="w-10 h-10 rounded-tk-pill bg-tk-cat-files flex items-center justify-center mr-16 text-tk-text-light shrink-0" data-sd-id="44">
+                            <iconify-icon icon="lucide:folder" class="text-lg"></iconify-icon>
+                        </div>
+                        <div class="flex-1 text-left" data-sd-id="45">
+                            <div class="font-medium text-[16px] leading-[24px]" data-sd-id="46">View files</div>
+                            <div class="text-[13px] text-tk-secondary-light" data-sd-id="47">Recent outputs &amp; folders</div>
+                        </div>
+                        <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary-light text-xl"></iconify-icon>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- Ongoing Task Strip -->
+            <section class="mb-20" data-sd-id="48">
+                <h3 class="text-[13px] font-medium text-tk-secondary-light uppercase tracking-wider mb-12" data-sd-id="49">Active Tasks</h3>
+                <div class="flex items-center p-12 bg-tk-primary-container rounded-tk-card border border-tk-border-light/50" data-sd-id="50">
+                    <div class="w-10 h-10 rounded-tk-pill bg-tk-surface-light flex items-center justify-center mr-12 text-tk-primary shrink-0" data-sd-id="51">
+                        <iconify-icon icon="lucide:arrow-down-circle" class="text-lg animate-pulse"></iconify-icon>
+                    </div>
+                    <div class="flex-1 min-w-0 mr-12" data-sd-id="52">
+                        <div class="font-medium text-[14px] truncate" data-sd-id="53">demo_lecture_recording_2023.mp4</div>
+                        <div class="flex items-center mt-4" data-sd-id="54">
+                            <div class="w-full bg-tk-surface-light/50 h-4 rounded-full overflow-hidden mr-8" data-sd-id="55">
+                                <div class="bg-tk-primary h-full rounded-full" style="width: 65%" data-sd-id="56"></div>
+                            </div>
+                            <span class="font-mono text-[12px] text-tk-secondary-light shrink-0" data-sd-id="57">65%</span>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-tk-surface-light/50 transition-colors text-tk-primary" aria-label="Pause download" data-sd-id="58">
+                        <iconify-icon icon="lucide:pause" class="text-lg"></iconify-icon>
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Demo Notice -->
+            <div class="text-center pb-24" data-sd-id="59">
+                 <span class="inline-block px-12 py-4 bg-tk-border-light/40 text-[12px] text-tk-secondary-light rounded-tk-pill" data-sd-id="60">
+                     Prototype Demo State
+                 </span>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <footer class="shrink-0 bg-tk-surface-light border-t border-tk-border-light pb-[34px] z-40 fixed bottom-0 w-full" data-sd-id="61">
+            <nav class="flex justify-around items-center h-[60px] px-8" data-sd-id="62">
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-primary focus:outline-none" data-sd-id="63">
+                    <div class="w-16 h-8 flex items-center justify-center bg-tk-primary-container rounded-tk-pill mb-4" data-sd-id="64">
+                        <iconify-icon icon="lucide:grid" class="text-xl"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="65">Tools</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-secondary-light hover:text-tk-text-light transition-colors focus:outline-none" data-sd-id="66">
+                    <div class="w-16 h-8 flex items-center justify-center mb-4" data-sd-id="67">
+                        <iconify-icon icon="lucide:download" class="text-xl"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="68">Downloads</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center w-full h-full text-tk-secondary-light hover:text-tk-text-light transition-colors focus:outline-none" data-sd-id="69">
+                    <div class="w-16 h-8 flex items-center justify-center mb-4" data-sd-id="70">
+                        <iconify-icon icon="lucide:folder-open" class="text-xl"></iconify-icon>
+                    </div>
+                    <span class="text-[12px] font-medium" data-sd-id="71">Files</span>
+                </button>
+            </nav>
+        </footer>
+
+        <!-- Interactive Sheets (Hidden by default) -->
+        
+        <!-- Settings Overlay -->
+        <div id="settings-overlay" class="fixed inset-0 bg-black/20 z-50 hidden opacity-0 transition-opacity duration-200" data-sd-id="72">
+            <div class="absolute bottom-0 w-full bg-tk-surface-light rounded-t-2xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[90vh]" data-sd-id="73">
+                <div class="w-full flex justify-center pt-12 pb-4" data-sd-id="74">
+                    <div class="w-[48px] h-4 bg-tk-border-light rounded-full" data-sd-id="75"></div>
+                </div>
+                <div class="px-20 pb-16 flex items-center justify-between border-b border-tk-border-light" data-sd-id="76">
+                    <h2 class="font-display text-[20px] font-medium" data-sd-id="77">Settings</h2>
+                    <button id="close-settings" aria-label="Close settings" class="p-8 -mr-8 text-tk-secondary-light" data-sd-id="78">
+                        <iconify-icon icon="lucide:x" class="text-xl"></iconify-icon>
+                    </button>
+                </div>
+                <div class="overflow-y-auto px-20 py-16 flex-1" data-sd-id="79">
+                    <div class="space-y-24" data-sd-id="80">
+                        <div data-sd-id="81">
+                            <div class="font-medium mb-8" data-sd-id="82">Theme</div>
+                            <div class="flex gap-8" data-sd-id="83">
+                                <button class="flex-1 py-8 border-2 border-tk-primary rounded-tk-btn bg-tk-canvas-light text-[14px] font-medium" data-sd-id="84">Light</button>
+                                <button class="flex-1 py-8 border border-tk-border-light rounded-tk-btn bg-tk-surface-light text-[14px]" data-sd-id="85">System</button>
+                                <button class="flex-1 py-8 border border-tk-border-light rounded-tk-btn bg-tk-surface-light text-[14px]" data-sd-id="86">Dark</button>
+                            </div>
+                        </div>
+                        
+                        <div data-sd-id="87">
+                            <div class="font-medium mb-8" data-sd-id="88">Output Folder</div>
+                            <button class="w-full flex items-center justify-between p-12 border border-tk-border-light rounded-tk-btn bg-tk-canvas-light" data-sd-id="89">
+                                <div class="flex items-center gap-12 overflow-hidden" data-sd-id="90">
+                                    <iconify-icon icon="lucide:folder" class="text-tk-secondary-light shrink-0"></iconify-icon>
+                                    <span class="font-mono text-[13px] truncate" data-sd-id="91">Downloads / Toolkit (sample)</span>
+                                </div>
+                                <iconify-icon icon="lucide:chevron-right" class="text-tk-secondary-light shrink-0"></iconify-icon>
+                            </button>
+                        </div>
+                        
+                         <div data-sd-id="92">
+                            <div class="font-medium mb-8 flex justify-between" data-sd-id="93">
+                                <span data-sd-id="94">History Retention</span>
+                                <span class="text-tk-secondary-light text-[14px]" data-sd-id="95">30 days</span>
+                            </div>
+                            <input type="range" min="1" max="3" value="2" class="w-full accent-tk-primary" data-sd-id="96">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-20 border-t border-tk-border-light pb-[calc(20px+34px)]" data-sd-id="97">
+                    <button class="w-full py-12 bg-tk-primary text-tk-on-primary rounded-tk-btn font-medium text-[16px]" data-sd-id="98">Done</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Simple sheet interaction simulation
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsOverlay = document.getElementById('settings-overlay');
+        const closeSettings = document.getElementById('close-settings');
+        const settingsSheet = settingsOverlay.querySelector('.absolute');
+
+        function openSheet(overlay, sheet) {
+            overlay.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity/transform
+            requestAnimationFrame(() => {
+                overlay.classList.remove('opacity-0');
+                sheet.classList.remove('translate-y-full');
+            });
+        }
+
+        function closeSheet(overlay, sheet) {
+            overlay.classList.add('opacity-0');
+            sheet.classList.add('translate-y-full');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        if(settingsBtn && settingsOverlay && closeSettings) {
+            settingsBtn.addEventListener('click', () => openSheet(settingsOverlay, settingsSheet));
+            closeSettings.addEventListener('click', () => closeSheet(settingsOverlay, settingsSheet));
+            settingsOverlay.addEventListener('click', (e) => {
+                if(e.target === settingsOverlay) closeSheet(settingsOverlay, settingsSheet);
+            });
+        }
+    </script>
+
+</body></html>
+```

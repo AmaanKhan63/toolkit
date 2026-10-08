@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "toolkit-dashboard": {
+      "targetKind": "existing-ui",
+      "projectId": "67a07e9d-597f-4bbc-8416-567520d5b34b",
+      "activeDraftId": "41479730-3489-47d2-b335-cf4b829f3717",
+      "designSystemPath": ".superdesign/design-system.md",
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "docs/design-review-2026-10-07.md",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolkitApp.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ImagesToPdfScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolkitTheme.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/Glyph.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolCatalogue.kt",
+        "docs/prototypes/review-2026-10-07/index.html",
+        "app/src/main/java/com/amaankhan/toolkit/ui/Components.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/SettingsScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfToolScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfPreview.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ImageResultPreview.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/TextPreview.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/DocumentActions.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/OfficeToolScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/WorkflowScreen.kt",
+        "docs/native-office-workflows-2026-10-07.md",
+        "app/src/main/java/com/amaankhan/toolkit/ui/DownloadsScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/TelegramScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/LocalViewerScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfViewerScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ScanScreen.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/RichToolScreen.kt",
+        "docs/native-toolkit-2026-10-07.md",
+        "docs/checkpoint-2026-10-07.md",
+        "docs/validation-2026-10-08.md",
+        "docs/tls-review-2026-10-08.md",
+        "app/src/main/java/com/amaankhan/toolkit/ui/InputFocus.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PreviewGestures.kt",
+        "app/src/main/java/com/amaankhan/toolkit/ui/SectionWebView.kt",
+        "docs/interaction-fixes-2026-10-08.md"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "43ca579afc52ae891ba7d5c42f5df9da252f7b34d559f2bd8bcf2a2aaaf614c2",
+        "docs/design-review-2026-10-07.md": "375a16e048747747c94c827ce9b9424f27cb55696b465519956333bd899dd938",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolkitApp.kt": "557dcb318d0e6cd7b6e391704593bf1088e6dbe898ad742c8689948a284ecac3",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ImagesToPdfScreen.kt": "c385fc1d72e638f321490c6ba0912fb1752a9a5042207fce69b034e207de72fe",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolkitTheme.kt": "747020d04f2027515540339e060c0957385d5036ecf2819b11d76e16131c3a06",
+        "app/src/main/java/com/amaankhan/toolkit/ui/Glyph.kt": "e0c138dbe0c85af8644a69f6aaa81b6447428e41624e4278d348e98c8e8c5de9",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ToolCatalogue.kt": "0d11b6b0ae8aad7b8f7296e0783a1a54ad86d00eac18e55f995c43e52a8a991d",
+        "docs/prototypes/review-2026-10-07/index.html": "2c41b531ce4b1def8e92257f9791c8a95cd710266ad317386e290df583456016",
+        "app/src/main/java/com/amaankhan/toolkit/ui/Components.kt": "d42f9d1535368e44c43cf32e16c4964a3bef6249e2c3b52cdce0585553211d8e",
+        "app/src/main/java/com/amaankhan/toolkit/ui/SettingsScreen.kt": "8fd2ecd30f09ab6cc0eb034c8f4c80310f0ab8e2044c9e9b14d23b4db8036d89",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfToolScreen.kt": "b6cc70ba91279f27134850fcbcb95b4e4492f30f35c38e162ba60ca8a43ef698",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfPreview.kt": "279cfe87784ee5a57ba7c1f373d9fb5a11d15ab737454f3c239f341e6a053f39",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ImageResultPreview.kt": "11c3e870a596adf48d2faf0ba35d3ffe11305e4955aa344c3d6e1b4f28fdcd39",
+        "app/src/main/java/com/amaankhan/toolkit/ui/TextPreview.kt": "3db657bc5a7c607e8c65cd30db7b043a2dd5eeaa95f4a918b2bcddc8cef8bbac",
+        "app/src/main/java/com/amaankhan/toolkit/ui/DocumentActions.kt": "cfdd2f11ed308be4ac9d46f4daba423bb85de08d7b914b30bb609e0dcd38780e",
+        "app/src/main/java/com/amaankhan/toolkit/ui/OfficeToolScreen.kt": "e2f0fdb15be52fc02e2d959ff8b652855050e1a8d6b2a8cb3f0e25e4f059fd6d",
+        "app/src/main/java/com/amaankhan/toolkit/ui/WorkflowScreen.kt": "6d66f3f05fcbfc459b550e2f38fc7420f947840503d058fd18095138645daf50",
+        "docs/native-office-workflows-2026-10-07.md": "c1122f70cdb78ccd0043c62cb49b9c0d24178106346b85ea7820e5df6cdcdf59",
+        "app/src/main/java/com/amaankhan/toolkit/ui/DownloadsScreen.kt": "453c4c50c63ec24474b7525776986d553e778c604cc5a0582bf242280f8779f8",
+        "app/src/main/java/com/amaankhan/toolkit/ui/TelegramScreen.kt": "5e28df6ded442a3e25afd0fd8bbba5c0f9efe07c877a243f64ead4ce7dab9700",
+        "app/src/main/java/com/amaankhan/toolkit/ui/LocalViewerScreen.kt": "80a3e9f87c55b9aea58f0b1eefb614b6a1be313b9346811fe64e128821b0837e",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PdfViewerScreen.kt": "e33628505dd46a8816f9e8ca9fe67e1398b036dbc3fd89b5c15a8fe59b7dd86b",
+        "app/src/main/java/com/amaankhan/toolkit/ui/ScanScreen.kt": "b7fa5008634a20a3fea123fee1c7ecc9adf9ae39a1c728e2fdf2c5a0983502f2",
+        "app/src/main/java/com/amaankhan/toolkit/ui/RichToolScreen.kt": "27c7352e2382697b15ab6208ba258bbc77fce201bad1a5520a305441d7dd4408",
+        "docs/native-toolkit-2026-10-07.md": "b67a2fbf60d55f50bc789888a0f48d5d097ea33f713d22ab87ecd5ac4a936545",
+        "docs/checkpoint-2026-10-07.md": "8bc6a53218190d83a0265e18a874500cf678dcc12f1e307663db4e3184d00c78",
+        "docs/validation-2026-10-08.md": "5cf4b0d73dc52e83fc9d326fc4f62bff9d0ab25af2e76fcc4ea82020c633d26b",
+        "docs/tls-review-2026-10-08.md": "faa670b56e1f5c41371dd2309358d8aff525270f6bd07f253ca40f8a2a21bb73",
+        "app/src/main/java/com/amaankhan/toolkit/ui/InputFocus.kt": "c58ad5ac1b9e2d5034e731584c8c77330a7ea629dcedf12a5a568612d60fc877",
+        "app/src/main/java/com/amaankhan/toolkit/ui/PreviewGestures.kt": "9493dcd4009ff8ac5704b5413355f22f7fb71f9c63c7d2686a2789ef9d0f431f",
+        "app/src/main/java/com/amaankhan/toolkit/ui/SectionWebView.kt": "14ea8f987c90b117be4889f47504dd482a2c622665c6de430269acf2f72c312a",
+        "docs/interaction-fixes-2026-10-08.md": "a5a63336ba567e5486754a53c9dcbb70a21686bc6db927f64e57c5c37c3494ae"
+      },
+      "components": [],
+      "drafts": {
+        "41479730-3489-47d2-b335-cf4b829f3717": {
+          "title": "Toolkit Dashboard Refined",
+          "visualDirection": "Corrected whole-app interactions; three selectable comparison palettes",
+          "currentVersion": 9,
+          "userApprovedVersion": 5,
+          "approvalDate": "2026-10-05",
+          "approvalScope": "Theme palettes approved with Platinum default; remaining interaction review separate. Historical full baseline approval remains version 5.",
+          "previewUrl": "https://p.superdesign.dev/draft/41479730-3489-47d2-b335-cf4b829f3717"
+        },
+        "9b07a303-234d-485d-af29-c3ef8d97420b": {
+          "title": "Toolkit Dashboard - Platinum Theme",
+          "currentVersion": 2,
+          "previewUrl": "https://p.superdesign.dev/draft/9b07a303-234d-485d-af29-c3ef8d97420b",
+          "visualDirection": "Corrected whole-app interactions; platinum theme, light and dark",
+          "approvalScope": "Theme palette approved for inclusion; remaining interaction review separate",
+          "themeApprovedVersion": 2,
+          "themeApprovalDate": "2026-10-07"
+        },
+        "982a4794-fadb-4c09-b012-b3ff7cf90695": {
+          "title": "Toolkit Dashboard Refined - Champagne Theme",
+          "currentVersion": 2,
+          "previewUrl": "https://p.superdesign.dev/draft/982a4794-fadb-4c09-b012-b3ff7cf90695",
+          "visualDirection": "Corrected whole-app interactions; champagne theme, light and dark",
+          "approvalScope": "Theme palette approved for inclusion; remaining interaction review separate",
+          "themeApprovedVersion": 2,
+          "themeApprovalDate": "2026-10-07"
+        },
+        "d1968392-721a-4143-b8c7-0196e53744e4": {
+          "title": "Toolkit - Theme Jade",
+          "currentVersion": 2,
+          "previewUrl": "https://p.superdesign.dev/draft/d1968392-721a-4143-b8c7-0196e53744e4",
+          "visualDirection": "Corrected whole-app interactions; jade theme, light and dark",
+          "approvalScope": "Theme palette approved for inclusion; remaining interaction review separate",
+          "themeApprovedVersion": 2,
+          "themeApprovalDate": "2026-10-07"
+        }
+      },
+      "updatedAt": "2026-10-08T10:39:10.233108+00:00",
+      "reviewStatus": "October 8 validation pass completed: 12 JVM and 54 native cases passing across engine/UI runs; one optional live-site skip. Telegram account and physical-device checks explicitly deferred. See docs/validation-2026-10-08.md.",
+      "referenceIds": [
+        "f2da579b-7e43-41f8-a93f-f79aa0cb5a1b",
+        "toolkit-folded-t"
+      ],
+      "launcherSelection": {
+        "choice": "A",
+        "name": "Folded T",
+        "date": "2026-10-07",
+        "sourcePath": "docs/prototypes/review-2026-10-07/launcher-a.svg"
+      },
+      "brandAssets": [
+        {
+          "assetKey": "toolkit-folded-t",
+          "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/projects/67a07e9d-597f-4bbc-8416-567520d5b34b/brand-assets/toolkit-folded-t/launcher-a.svg",
+          "sourcePath": "docs/prototypes/review-2026-10-07/launcher-a.svg"
+        }
+      ],
+      "selectedTheme": "platinum",
+      "defaultTheme": "platinum",
+      "enabledThemes": [
+        "platinum",
+        "champagne",
+        "jade"
+      ],
+      "themeDecision": {
+        "date": "2026-10-07",
+        "userFeedback": "All 3, platinum default",
+        "scope": "All three palettes in Settings; Platinum default; light/dark/system appearance independent",
+        "sourceDraftVersion": 9,
+        "branchVersion": 2
+      },
+      "implementationAuthorization": {
+        "date": "2026-10-07",
+        "userFeedback": "Then what are you waiting for?",
+        "scope": "Proceed with native Android implementation using the reviewed design; no further design approval gate"
+      },
+      "nativeImplementationDocument": "docs/native-toolkit-2026-10-07.md",
+      "interactionFeedback": "0.4.1: transparent icon interiors, outside-tap keyboard dismissal, preview swipes; 8 new UI regressions pass, 9 existing UI regressions passed in preceding run. No new canvas generation."
+    }
+  }
+}
