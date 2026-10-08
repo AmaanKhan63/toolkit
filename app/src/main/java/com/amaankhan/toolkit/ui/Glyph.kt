@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.amaankhan.toolkit.R
 
-// Phosphor duotone vectors, bundled offline. See third-party/Phosphor-LICENSE.txt.
+// Phosphor vectors with decorative duotone fills removed, bundled offline. See third-party/Phosphor-LICENSE.txt.
 enum class Glyph(val resource: Int) {
     GRID(R.drawable.ph_squares_four),
     IMAGE(R.drawable.ph_images),
