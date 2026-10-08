@@ -82,15 +82,17 @@ import java.io.ByteArrayInputStream
                     IconButton(onClick = { section = current + 1 }, enabled = current < doc.sections.lastIndex) { GlyphIcon(Glyph.CHEVRON, "Next section") }
                 }
                 val html = if (source) "<pre>${htmlEscape(doc.source)}</pre>" else doc.sections[current].html
-                SafeDocumentWebView(documentHtml(html), textZoom, Modifier.weight(1f).fillMaxWidth()) { webView = it }
+                SafeDocumentWebView(documentHtml(html), textZoom, Modifier.weight(1f).fillMaxWidth(),
+                    onNavigate = if (doc.sections.size > 1 && !source) { { delta -> section = (current + delta).coerceIn(doc.sections.indices) } } else null
+                ) { webView = it }
             }
         }
     } }
 }
 
-@Composable fun SafeDocumentWebView(html: String, zoom: Int = 100, modifier: Modifier = Modifier, onView: (WebView) -> Unit = {}) {
+@Composable fun SafeDocumentWebView(html: String, zoom: Int = 100, modifier: Modifier = Modifier, onNavigate: ((Int) -> Unit)? = null, onView: (WebView) -> Unit = {}) {
     var previous by remember { mutableStateOf("") }
-    AndroidView(factory = { context -> WebView(context).apply {
+    AndroidView(factory = { context -> SectionWebView(context).apply {
         settings.javaScriptEnabled = false; settings.allowFileAccess = false; settings.allowContentAccess = false
         settings.blockNetworkLoads = true; settings.domStorageEnabled = false; settings.databaseEnabled = false
         settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
@@ -100,7 +102,7 @@ import java.io.ByteArrayInputStream
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = true
         }
         onView(this)
-    } }, update = { view -> view.settings.textZoom = zoom; if (previous != html) { previous = html; view.loadDataWithBaseURL("https://document.toolkit.invalid/", html, "text/html", "UTF-8", null) } }, onRelease = { it.stopLoading(); it.destroy() }, modifier = modifier.clipToBounds())
+    } }, update = { view -> view.onNavigate = onNavigate; view.settings.textZoom = zoom; if (previous != html) { previous = html; view.loadDataWithBaseURL("https://document.toolkit.invalid/", html, "text/html", "UTF-8", null) } }, onRelease = { it.stopLoading(); it.destroy() }, modifier = modifier.clipToBounds())
 }
 
 @Composable private fun StructuredTextViewer(uri: String, name: String) {

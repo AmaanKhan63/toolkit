@@ -31,10 +31,9 @@ import kotlin.math.roundToInt
 private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, val error: String? = null)
 
 /** Renders the actual generated file. Only one bounded page bitmap is retained per viewer. */
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable fun PdfPreview(uri: String, modifier: Modifier = Modifier, jump: Pair<Int, Int>? = null, onPageChanged: (Int) -> Unit = {}) {
     var page by rememberSaveable(uri) { mutableIntStateOf(0) }
-    LaunchedEffect(jump) { jump?.let { page = it.first.coerceAtLeast(0) } }
     LaunchedEffect(page) { onPageChanged(page) }
     var zoom by rememberSaveable(uri) { mutableFloatStateOf(1f) }
     var panX by remember { mutableFloatStateOf(0f) }
@@ -65,6 +64,7 @@ private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, 
         catch (_: Exception) { RenderedPage(error = "This PDF could not be opened. It may be damaged, encrypted, or no longer accessible.") }
     }
     fun setZoom(next: Float) { zoom = next.coerceIn(1f, 3f); if (zoom == 1f) { panX = 0f; panY = 0f } }
+    LaunchedEffect(jump) { jump?.let { page = it.first.coerceAtLeast(0); setZoom(1f) } }
     Column(modifier) {
         FlowRow(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
           Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,12 +79,15 @@ private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, 
           }
         }
         Box(Modifier.fillMaxWidth().weight(1f).background(MaterialTheme.colorScheme.surfaceVariant).clipToBounds().onSizeChanged { viewport = it }
+            .previewPageSwipe(zoom <= 1f && rendered.count > 0) { delta ->
+                page = (page + delta).coerceIn(0, rendered.count - 1); setZoom(1f)
+            }
             .transformable(rememberTransformableState { scale, pan, _ ->
                 setZoom(zoom * scale)
                 val maxX = viewport.width * (zoom - 1f) / 2f
                 val maxY = viewport.height * (zoom - 1f) / 2f
                 panX = (panX + pan.x).coerceIn(-maxX, maxX); panY = (panY + pan.y).coerceIn(-maxY, maxY)
-            }), contentAlignment = Alignment.Center) {
+            }, canPan = { zoom > 1f }), contentAlignment = Alignment.Center) {
             when {
                 rendered.error != null -> Text(rendered.error!!, Modifier.padding(24.dp), style = MaterialTheme.typography.bodyLarge)
                 rendered.bitmap != null -> Image(rendered.bitmap!!.asImageBitmap(), "PDF page ${page + 1}", Modifier.fillMaxSize().padding(16.dp).graphicsLayer {

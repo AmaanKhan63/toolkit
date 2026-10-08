@@ -22,6 +22,7 @@ import com.amaankhan.toolkit.documents.PdfResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable fun ImageResultPreview(result: PdfResult, modifier: Modifier = Modifier) {
     var page by rememberSaveable(result.file.path) { mutableIntStateOf(0) }
     var zoom by remember { mutableFloatStateOf(1f) }
@@ -42,11 +43,14 @@ import kotlinx.coroutines.withContext
         }
         Text("Source page ${result.sourcePages[page]} · ${result.images[page].extension.uppercase()}", Modifier.padding(horizontal = 20.dp, vertical = 8.dp), style = MaterialTheme.typography.bodySmall)
         Box(Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant).clipToBounds().onSizeChanged { viewport = it }
+            .previewPageSwipe(zoom <= 1f && bitmap != null) { delta ->
+                page = (page + delta).coerceIn(0, result.images.lastIndex); x = 0f; y = 0f
+            }
             .transformable(rememberTransformableState { factor, pan, _ ->
                 zoom = (zoom * factor).coerceIn(1f, 3f)
                 val maxX = viewport.width * (zoom - 1f) / 2f; val maxY = viewport.height * (zoom - 1f) / 2f
                 x = (x + pan.x).coerceIn(-maxX, maxX); y = (y + pan.y).coerceIn(-maxY, maxY)
-            }), contentAlignment = Alignment.Center) {
+            }, canPan = { zoom > 1f }), contentAlignment = Alignment.Center) {
             if (bitmap == null) CircularProgressIndicator() else Image(bitmap!!.asImageBitmap(), "Exported image ${page + 1}", Modifier.fillMaxSize().padding(16.dp).graphicsLayer { scaleX = zoom; scaleY = zoom; translationX = x; translationY = y })
         }
     }

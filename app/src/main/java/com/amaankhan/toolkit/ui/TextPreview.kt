@@ -29,7 +29,9 @@ import java.io.File
         catch (e: kotlinx.coroutines.CancellationException) { throw e }
         catch (_: Exception) { "This file could not be opened." to false }
     }
-    Column(modifier) {
+    Column(modifier.previewPageSwipe(result != null) { delta ->
+        if (delta < 0 && chunk > 0 || delta > 0 && result?.second == true) chunk += delta
+    }) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             TextButton(onClick = { chunk-- }, enabled = chunk > 0 && result != null) { Text("Previous part") }
             Text("Part ${chunk + 1}", modifier = Modifier.padding(top = 12.dp), style = MaterialTheme.typography.bodySmall)
