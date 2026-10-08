@@ -152,7 +152,7 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                     itemsIndexed(state.inputs, key = { _, input -> input.uri }) { index, input -> Surface(shape = RoundedCornerShape(16.dp)) {
                         Column(Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) { GlyphIcon(Glyph.FILE); Text(input.name, Modifier.weight(1f).padding(start = 12.dp), style = MaterialTheme.typography.titleSmall); IconButton(onClick = { model.remove(index) }, enabled = !state.busy) { GlyphIcon(Glyph.CLOSE, "Remove ${input.name}") } }
-                            if (toolId == "D02") OutlinedTextField(ranges[input.uri].orEmpty(), { ranges = ranges + (input.uri to it) }, label = { Text("Pages from this PDF · blank for all") }, placeholder = { Text("1, 3-5") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
+                            if (toolId == "D02") ToolkitTextField(ranges[input.uri].orEmpty(), { ranges = ranges + (input.uri to it) }, label = { Text("Pages from this PDF · blank for all") }, placeholder = { Text("1, 3-5") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                             if (toolId == "D02") Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                                 IconButton(onClick = { model.move(index, -1) }, enabled = !state.busy && index > 0) { GlyphIcon(Glyph.UP, "Move file ${index + 1} up") }
                                 IconButton(onClick = { model.move(index, 1) }, enabled = !state.busy && index < state.inputs.lastIndex) { GlyphIcon(Glyph.DOWN, "Move file ${index + 1} down") }
@@ -173,14 +173,14 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                         }
                         if (toolId in setOf("P01", "P02", "P03", "P14", "D12", "D05", "P04", "P09")) {
                             item { ChoiceField("Pages", if (allPages) "All pages" else "Selected pages", listOf("All pages", "Selected pages"), !state.busy) { allPages = it == "All pages" } }
-                            if (!allPages) item { OutlinedTextField(pages, { pages = it }, label = { Text(if (toolId == "P02") "Page order" else "Page selection") }, placeholder = { Text(if (toolId == "P02") "3, 1, 2, 2" else "1, 3-5") }, supportingText = { Text(if (toolId == "P02") "Repeat pages to duplicate; omit pages to remove." else "Enter page numbers and ranges.${state.pageCount?.let { " $it pages available." }.orEmpty()}") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
+                            if (!allPages) item { ToolkitTextField(pages, { pages = it }, label = { Text(if (toolId == "P02") "Page order" else "Page selection") }, placeholder = { Text(if (toolId == "P02") "3, 1, 2, 2" else "1, 3-5") }, supportingText = { Text(if (toolId == "P02") "Repeat pages to duplicate; omit pages to remove." else "Enter page numbers and ranges.${state.pageCount?.let { " $it pages available." }.orEmpty()}") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
                         }
                         if (toolId == "P14") item { ChoiceField("Text output", textFormat, listOf("TXT", "Markdown"), !state.busy) { textFormat = it }; EmptyNote("Markdown preserves text with page headings; complex PDF formatting is not reconstructed.") }
                         if (toolId == "P02") {
                             item { OutlinedButton(onClick = { insertPicker.launch(arrayOf("application/pdf")) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text(if (state.inputs.size > 1) "Replace inserted PDF" else "Insert pages from another PDF") } }
                             if (state.inputs.size > 1) {
-                                item { OutlinedTextField(insertPages, { insertPages = it }, label = { Text("Inserted pages · blank for all") }, modifier = Modifier.fillMaxWidth()) }
-                                item { OutlinedTextField(insertAfter, { insertAfter = it.filter(Char::isDigit).take(4) }, label = { Text("Insert after output page · blank for end") }, supportingText = { Text("0 inserts before the first page.") }, modifier = Modifier.fillMaxWidth()) }
+                                item { ToolkitTextField(insertPages, { insertPages = it }, label = { Text("Inserted pages · blank for all") }, modifier = Modifier.fillMaxWidth()) }
+                                item { ToolkitTextField(insertAfter, { insertAfter = it.filter(Char::isDigit).take(4) }, label = { Text("Insert after output page · blank for end") }, supportingText = { Text("0 inserts before the first page.") }, modifier = Modifier.fillMaxWidth()) }
                             }
                         }
                         if (toolId == "D12") {
@@ -191,8 +191,8 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                         }
                         if (toolId == "P01") {
                             item { ChoiceField("Output", splitMode, listOf("One PDF", "Every N pages", "Custom ranges"), !state.busy) { splitMode = it } }
-                            if (splitMode == "Every N pages") item { OutlinedTextField(splitEvery, { splitEvery = it.filter(Char::isDigit).take(4) }, label = { Text("Pages per document") }, modifier = Modifier.fillMaxWidth()) }
-                            if (splitMode == "Custom ranges") item { OutlinedTextField(splitGroups, { splitGroups = it }, label = { Text("Groups separated by semicolons") }, placeholder = { Text("1-3; 4,6; 7-10") }, supportingText = { Text("Each group creates a separate PDF in a ZIP.") }, modifier = Modifier.fillMaxWidth()) }
+                            if (splitMode == "Every N pages") item { ToolkitTextField(splitEvery, { splitEvery = it.filter(Char::isDigit).take(4) }, label = { Text("Pages per document") }, modifier = Modifier.fillMaxWidth()) }
+                            if (splitMode == "Custom ranges") item { ToolkitTextField(splitGroups, { splitGroups = it }, label = { Text("Groups separated by semicolons") }, placeholder = { Text("1-3; 4,6; 7-10") }, supportingText = { Text("Each group creates a separate PDF in a ZIP.") }, modifier = Modifier.fillMaxWidth()) }
                         }
                         if (toolId == "D05") {
                             item { ChoiceField("Compression", compression, listOf("Lossless cleanup", "High quality · 2400 px", "Balanced · 1800 px", "Smallest · 800 px"), !state.busy) { compression = it } }
@@ -201,8 +201,8 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                         if (toolId == "P04" || toolId == "P09") {
                             if (toolId == "P04") item { ChoiceField("Mark", markType, listOf("Page numbers", "Text", "Image"), !state.busy) { markType = it; if (it == "Page numbers") { markText = "{page} / {total}"; markY = 95f; opacity = 1f } else if (it == "Text") { markText = "CONFIDENTIAL"; markY = 50f; opacity = .35f } } }
                             if (markType != "Image" && toolId != "P09") {
-                                item { OutlinedTextField(markText, { markText = it.take(160) }, label = { Text("Text · {page} and {total} supported") }, modifier = Modifier.fillMaxWidth()) }
-                                item { OutlinedTextField(markSize, { markSize = it.filter(Char::isDigit).take(2) }, label = { Text("Text size (8?96 pt)") }, modifier = Modifier.fillMaxWidth()) }
+                                item { ToolkitTextField(markText, { markText = it.take(160) }, label = { Text("Text · {page} and {total} supported") }, modifier = Modifier.fillMaxWidth()) }
+                                item { ToolkitTextField(markSize, { markSize = it.filter(Char::isDigit).take(2) }, label = { Text("Text size (8?96 pt)") }, modifier = Modifier.fillMaxWidth()) }
                             } else {
                                 if (toolId == "P09") item { PrimaryAction("Draw signature", !state.busy) { signaturePad = true } }
                                 item { OutlinedButton(onClick = { assetPicker.launch(arrayOf("image/png", "image/jpeg")) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text(if (asset.isBlank()) "Choose an image" else "Image selected · Replace") } }
@@ -218,10 +218,10 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                             item { Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(linkedCrop, { linkedCrop = it }, enabled = !state.busy); Text("Use the same crop on every edge") } }
                             if (!linkedCrop) item {
                                 listOf("Top" to cropTop, "Right" to cropRight, "Bottom" to cropBottom, "Left" to cropLeft).forEach { (edge, value) ->
-                                    OutlinedTextField(value, { next -> val filtered = next.filter(Char::isDigit).take(3); when (edge) { "Top" -> cropTop = filtered; "Right" -> cropRight = filtered; "Bottom" -> cropBottom = filtered; else -> cropLeft = filtered } }, label = { Text("$edge crop (px)") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
+                                    ToolkitTextField(value, { next -> val filtered = next.filter(Char::isDigit).take(3); when (edge) { "Top" -> cropTop = filtered; "Right" -> cropRight = filtered; "Bottom" -> cropBottom = filtered; else -> cropLeft = filtered } }, label = { Text("$edge crop (px)") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                                 }
                             }
-                            if (linkedCrop) item { OutlinedTextField(crop, { crop = it.take(4) }, label = { Text("Crop each edge") }, suffix = { Text("px") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
+                            if (linkedCrop) item { ToolkitTextField(crop, { crop = it.take(4) }, label = { Text("Crop each edge") }, suffix = { Text("px") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
                             item { EmptyNote("96 px = 1 inch. Cropping changes the visible page area; it does not delete hidden content.") }
                         }
                         if (toolId == "P16") item { OutlinedButton(onClick = { model.inspectMetadata(password) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text("Inspect metadata") }; if (metadata.isNotBlank()) Text(metadata, style = MaterialTheme.typography.bodySmall) }
@@ -236,7 +236,7 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
 }
 @Composable fun PasswordField(label: String, value: String, enabled: Boolean, onChange: (String) -> Unit) {
     var visible by remember { mutableStateOf(false) }
-    OutlinedTextField(value, onChange, label = { Text(label) }, singleLine = true, enabled = enabled, modifier = Modifier.fillMaxWidth(),
+    ToolkitTextField(value, onChange, label = { Text(label) }, singleLine = true, enabled = enabled, modifier = Modifier.fillMaxWidth(),
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = { TextButton(onClick = { visible = !visible }) { Text(if (visible) "Hide" else "Show") } })
 }

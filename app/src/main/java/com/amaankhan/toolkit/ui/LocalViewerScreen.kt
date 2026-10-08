@@ -71,7 +71,7 @@ import java.io.ByteArrayInputStream
                     TextButton(onClick = { fullScreen = true }) { Text("Fullscreen") }
                 }
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    OutlinedTextField(query, { query = it; webView?.findAllAsync(it) }, label = { Text("Find text") }, singleLine = true, modifier = Modifier.weight(1f))
+                    ToolkitTextField(query, { query = it; webView?.findAllAsync(it) }, label = { Text("Find text") }, singleLine = true, modifier = Modifier.weight(1f))
                     IconButton(onClick = { webView?.findNext(false) }, enabled = query.isNotBlank()) { GlyphIcon(Glyph.BACK, "Previous match") }
                     IconButton(onClick = { webView?.findNext(true) }, enabled = query.isNotBlank()) { GlyphIcon(Glyph.CHEVRON, "Next match") }
                 }

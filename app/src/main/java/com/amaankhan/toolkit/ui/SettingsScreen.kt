@@ -63,8 +63,8 @@ import com.amaankhan.toolkit.data.*
                 }
                 "User profile" -> {
                     item { InfoCard("Your local profile", "A name and workspace label for this device. This does not create an online account.") }
-                    item { OutlinedTextField(name, { name = it.take(60) }, label = { Text("Display name") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
-                    item { OutlinedTextField(workspace, { workspace = it.take(60) }, label = { Text("Workspace label") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                    item { ToolkitTextField(name, { name = it.take(60) }, label = { Text("Display name") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                    item { ToolkitTextField(workspace, { workspace = it.take(60) }, label = { Text("Workspace label") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
                 }
                 "Licenses" -> item {
                     val context = LocalContext.current

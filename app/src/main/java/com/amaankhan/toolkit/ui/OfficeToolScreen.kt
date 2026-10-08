@@ -82,9 +82,9 @@ val implementedOfficeTools = setOf("D04", "D07", "P17")
                         }
                         if (protection == "Sheet & workbook editing") item { EmptyNote("Applies to all worksheets and workbook structure. If the source has a file-open password, the saved result removes that encryption; use File-open password → Lock to encrypt it again.") }
                     } else {
-                        item { OutlinedTextField(sheets, { sheets = it.take(200) }, label = { Text("Worksheets") }, supportingText = { Text("Blank includes visible sheets. Use sheet positions, for example 1, 3–5.") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
+                        item { ToolkitTextField(sheets, { sheets = it.take(200) }, label = { Text("Worksheets") }, supportingText = { Text("Blank includes visible sheets. Use sheet positions, for example 1, 3–5.") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
                         item { ChoiceField("PDF pages", selection, listOf("All pages", "Selected pages"), !state.busy) { selection = it } }
-                        if (selection == "Selected pages") item { OutlinedTextField(pages, { pages = it.take(200) }, label = { Text("Page range") }, supportingText = { Text("For example 1, 3–5. Page numbers refer to the generated table layout; invalid ranges are rejected.") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
+                        if (selection == "Selected pages") item { ToolkitTextField(pages, { pages = it.take(200) }, label = { Text("Page range") }, supportingText = { Text("For example 1, 3–5. Page numbers refer to the generated table layout; invalid ranges are rejected.") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) }
                     }
                     item { PasswordField("Current file-open password (if encrypted)", currentPassword, !state.busy) { currentPassword = it } }
                     item { EmptyNote("Original workbook stays unchanged. Passwords are used for this run and are never saved.") }

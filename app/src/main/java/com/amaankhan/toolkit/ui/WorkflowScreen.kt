@@ -95,7 +95,7 @@ import com.amaankhan.toolkit.documents.*
                         resetRun(); editor.select(saved.first { "${it.name} · ${it.id.take(6)}" == label })
                     }
                 }
-                item { OutlinedTextField(template.name, editor::rename, label = { Text("Workflow name") }, singleLine = true, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) }
+                item { ToolkitTextField(template.name, editor::rename, label = { Text("Workflow name") }, singleLine = true, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) }
                 if (template.steps.isEmpty()) item {
                     InfoCard("Choose your starting tool", "Start with any supported document or images. Each step receives the previous step’s output.")
                     TextButton(onClick = {
@@ -110,15 +110,15 @@ import com.amaankhan.toolkit.documents.*
                             if (step.operation == WorkflowOperation.IMAGES_PDF) {
                                 ChoiceField("Page size", Paper.valueOf(step.paper).label, Paper.entries.map { it.label }, !state.busy) { label -> editor.change(step.copy(paper = Paper.entries.first { it.label == label }.name)) }
                                 ChoiceField("Orientation", Orientation.valueOf(step.orientation).label, Orientation.entries.map { it.label }, !state.busy) { label -> editor.change(step.copy(orientation = Orientation.entries.first { it.label == label }.name)) }
-                                OutlinedTextField(step.marginPx, { editor.change(step.copy(marginPx = it.take(3))) }, label = { Text("Margin on each side") }, suffix = { Text("px") },
+                                ToolkitTextField(step.marginPx, { editor.change(step.copy(marginPx = it.take(3))) }, label = { Text("Margin on each side") }, suffix = { Text("px") },
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), supportingText = { Text("0–160 px · 96 px per inch") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                             }
                             if (step.operation == WorkflowOperation.EXCEL_PDF) {
                                 EmptyNote("Table layout with cached values. Excel charts, print layout and styling are not reproduced.")
-                                OutlinedTextField(step.sheets, { editor.change(step.copy(sheets = it.take(200))) }, label = { Text("Sheets · blank for visible sheets") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
+                                ToolkitTextField(step.sheets, { editor.change(step.copy(sheets = it.take(200))) }, label = { Text("Sheets · blank for visible sheets") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                             }
                             if (step.operation.input == WorkflowType.PDF || step.operation in setOf(WorkflowOperation.WORD_PDF, WorkflowOperation.PRESENTATION_PDF, WorkflowOperation.TEXT_PDF, WorkflowOperation.HTML_PDF)) {
-                                OutlinedTextField(step.pages, { editor.change(step.copy(pages = it.take(200))) }, label = { Text("Pages · blank for all") }, placeholder = { Text("1, 3–5") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
+                                ToolkitTextField(step.pages, { editor.change(step.copy(pages = it.take(200))) }, label = { Text("Pages · blank for all") }, placeholder = { Text("1, 3–5") }, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                             }
                             if (step.operation == WorkflowOperation.PDF_ROTATE) ChoiceField("Rotation", "${step.rotation}°", listOf("0°", "90°", "180°", "270°"), !state.busy) { editor.change(step.copy(rotation = it.removeSuffix("°").toInt())) }
                             if (step.operation == WorkflowOperation.PDF_CROP) ChoiceField("Crop per edge", "${step.cropPx} px", listOf("0 px", "8 px", "16 px", "24 px", "32 px", "48 px"), !state.busy) { editor.change(step.copy(cropPx = it.removeSuffix(" px").toInt())) }
@@ -128,7 +128,7 @@ import com.amaankhan.toolkit.documents.*
                             }
                             if (step.operation == WorkflowOperation.PDF_COMPRESS) ChoiceField("Image longest edge", "${step.imageEdge} px", listOf("1200 px", "1800 px", "2400 px"), !state.busy) { editor.change(step.copy(imageEdge = it.removeSuffix(" px").toInt())) }
                             if (step.operation == WorkflowOperation.PDF_STAMP) {
-                                OutlinedTextField(step.stampText, { editor.change(step.copy(stampText = it.take(160))) }, label = { Text("Text · {page} and {total} supported") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy)
+                                ToolkitTextField(step.stampText, { editor.change(step.copy(stampText = it.take(160))) }, label = { Text("Text · {page} and {total} supported") }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy)
                                 Text("Vertical position · ${step.stampY}%"); Slider(step.stampY.toFloat(), { editor.change(step.copy(stampY = it.toInt())) }, valueRange = 0f..100f, enabled = !state.busy)
                                 Text("Opacity · ${step.stampOpacity}%"); Slider(step.stampOpacity.toFloat(), { editor.change(step.copy(stampOpacity = it.toInt())) }, valueRange = 5f..100f, enabled = !state.busy)
                             }

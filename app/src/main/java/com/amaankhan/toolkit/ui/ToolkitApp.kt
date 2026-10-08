@@ -125,7 +125,7 @@ val toolGroups = listOf(
     var query by rememberSaveable { mutableStateOf("") }
     val singleColumn = LocalConfiguration.current.screenWidthDp < 360 || LocalDensity.current.fontScale > 1.2f
     LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { OutlinedTextField(query, { query = it }, placeholder = { Text("Search tools or formats") }, singleLine = true,
+        item { ToolkitTextField(query, { query = it }, placeholder = { Text("Search tools or formats") }, singleLine = true,
             leadingIcon = { GlyphIcon(Glyph.SEARCH) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { GlyphIcon(Glyph.CLOSE, "Clear search") } },
             shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface, focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant)) }

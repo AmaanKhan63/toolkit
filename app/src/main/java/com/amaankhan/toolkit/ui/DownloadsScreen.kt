@@ -93,7 +93,7 @@ import org.json.JSONObject
         Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             Text("Transfer settings", style = MaterialTheme.typography.titleLarge)
             var total by remember { mutableStateOf(model.store.totalLimitKiB.toString()) }
-            OutlinedTextField(total, { value -> total = value.filter(Char::isDigit).take(7); model.store.totalLimitKiB = total.toLongOrNull() ?: 0 }, label = { Text("Combined limit (KB/s)") }, supportingText = { Text("0 = unlimited. Shared across two direct / media transfer slots. Changes apply to media when its next transfer starts. Telegram uses its own connection.") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+            ToolkitTextField(total, { value -> total = value.filter(Char::isDigit).take(7); model.store.totalLimitKiB = total.toLongOrNull() ?: 0 }, label = { Text("Combined limit (KB/s)") }, supportingText = { Text("0 = unlimited. Shared across two direct / media transfer slots. Changes apply to media when its next transfer starts. Telegram uses its own connection.") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
             val updating by model.busy.collectAsStateWithLifecycle()
             OutlinedButton(onClick = model::updateMediaEngine, enabled = !updating, modifier = Modifier.fillMaxWidth()) { Text(if (updating) "Updating media engine…" else "Update yt-dlp") }
             EmptyNote("Update the media engine if a supported site stops working. Transfers keep their files and progress when paused.")
@@ -139,13 +139,13 @@ import org.json.JSONObject
     Column(Modifier.fillMaxSize()) {
         Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = back) { GlyphIcon(Glyph.BACK, "Back to downloads") }; Text(kind.label, style = MaterialTheme.typography.titleLarge) }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { OutlinedTextField(links, { links = it.take(32000); model.inspection.value = null }, label = { Text(if (kind == DownloadKind.TORRENT) "Magnet link" else "Link or multiple links, one per line") }, minLines = 2, enabled = !busy, modifier = Modifier.fillMaxWidth()) }
+            item { ToolkitTextField(links, { links = it.take(32000); model.inspection.value = null }, label = { Text(if (kind == DownloadKind.TORRENT) "Magnet link" else "Link or multiple links, one per line") }, minLines = 2, enabled = !busy, modifier = Modifier.fillMaxWidth()) }
             if (kind == DownloadKind.TORRENT) {
                 item { OutlinedButton(onClick = { torrentPicker.launch(arrayOf("application/x-bittorrent", "application/octet-stream")) }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(if (torrent == null) "Choose a .torrent file instead" else "Torrent file selected · Replace") } }
                 item { NumericDownloadField("Seed after downloading (minutes)", seed) { seed = it }; EmptyNote("0 stops at completion. Uploading to peers also happens during the download.") }
                 item { NumericDownloadField("Upload limit (KB/s)", upload) { upload = it } }
             }
-            if (kind == DownloadKind.DIRECT) item { OutlinedTextField(name, { name = it.take(180) }, label = { Text("Filename (optional for a single link)") }, modifier = Modifier.fillMaxWidth()) }
+            if (kind == DownloadKind.DIRECT) item { ToolkitTextField(name, { name = it.take(180) }, label = { Text("Filename (optional for a single link)") }, modifier = Modifier.fillMaxWidth()) }
             if (kind == DownloadKind.VIDEO) {
                 item { ChoiceField("Format", container, listOf("mkv", "mp4", "mp3", "m4a", "opus")) { container = it } }
                 item { ChoiceField("Video quality", quality, listOf("Best available", "2160p", "1440p", "1080p", "720p", "480p", "360p")) { quality = it } }
@@ -190,7 +190,7 @@ import org.json.JSONObject
     }
 }
 @Composable private fun NumericDownloadField(label: String, value: String, update: (String) -> Unit) {
-    OutlinedTextField(value, { update(it.filter(Char::isDigit).take(7)) }, label = { Text(label) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+    ToolkitTextField(value, { update(it.filter(Char::isDigit).take(7)) }, label = { Text(label) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
 }
 @Composable private fun TorrentFileSelection(entry: DownloadEntry, back: () -> Unit, start: (Set<Int>) -> Unit) {
     val files = remember(entry.files) { jsonObjects(entry.files) }

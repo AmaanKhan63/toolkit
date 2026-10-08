@@ -70,17 +70,17 @@ import kotlinx.coroutines.withContext
                     item { Text("Connect your Telegram account", style = MaterialTheme.typography.titleMedium); EmptyNote("Browse channels and groups you already have access to. No bot token is needed.") }
                     item { InfoCard("Get your API credentials", "1. Open my.telegram.org and sign in.\n2. Choose API development tools.\n3. Use your existing application, or create one with a title and short name.\n4. Copy its api_id and api_hash below.\n\nThese stay encrypted on this device. Your Telegram login code and 2FA password are used only for signing in.") }
                     item { OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://my.telegram.org/apps"))) }, modifier = Modifier.fillMaxWidth()) { Text("Open Telegram API settings") } }
-                    item { OutlinedTextField(apiId, { apiId = it.filter(Char::isDigit).take(12) }, label = { Text("API ID") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                    item { ToolkitTextField(apiId, { apiId = it.filter(Char::isDigit).take(12) }, label = { Text("API ID") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
                     item { PasswordField("API hash", apiHash, !working) { apiHash = it.take(32) } }
                     item { PrimaryAction("Connect", !working && apiId.isNotBlank() && apiHash.length == 32) { perform { telegram.connect(apiId, apiHash); apiHash = "" } } }
                 }
                 "phone", "code", "password", "email", "email-code" -> {
                     item { Text(status.hint, style = MaterialTheme.typography.titleMedium) }
-                    item { if (status.step == "password") PasswordField("Two-step verification password", value, !working) { value = it } else OutlinedTextField(value, { value = it.take(200) }, label = { Text(when (status.step) { "phone" -> "Phone number with country code"; "email" -> "Email address"; else -> "Login code" }) }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                    item { if (status.step == "password") PasswordField("Two-step verification password", value, !working) { value = it } else ToolkitTextField(value, { value = it.take(200) }, label = { Text(when (status.step) { "phone" -> "Phone number with country code"; "email" -> "Email address"; else -> "Login code" }) }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
                     item { PrimaryAction("Continue", !working && value.isNotBlank()) { perform { telegram.submit(value); value = "" } } }
                 }
                 "ready" -> {
-                    item { OutlinedTextField(query, { query = it.take(200) }, label = { Text(if (chat == null) "Search your chats" else "Search filenames / captions") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                    item { ToolkitTextField(query, { query = it.take(200) }, label = { Text(if (chat == null) "Search your chats" else "Search filenames / captions") }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
                     item { OutlinedButton(onClick = { if (chat == null) perform { chats = telegram.chats(query, chatLimit) } else loadFiles() }, enabled = !working, modifier = Modifier.fillMaxWidth()) { Text("Search") } }
                     if (chat == null) {
                         items(chats, key = { it.id }) { item -> Surface(onClick = { chat = item; query = "" }, shape = RoundedCornerShape(16.dp)) { Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { Text(item.title, Modifier.weight(1f)); GlyphIcon(Glyph.CHEVRON) } } }

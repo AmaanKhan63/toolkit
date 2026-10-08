@@ -3,6 +3,8 @@
 package com.amaankhan.toolkit.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
@@ -63,5 +65,7 @@ private val AppTypography = Typography(
 )
 @Composable fun isDarkTheme(choice: ThemeChoice) = choice == ThemeChoice.DARK || choice == ThemeChoice.SYSTEM && isSystemInDarkTheme()
 @Composable fun ToolkitTheme(choice: ThemeChoice, palette: com.amaankhan.toolkit.data.Palette = com.amaankhan.toolkit.data.Palette.PLATINUM, content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = toolkitColors(palette, isDarkTheme(choice)), typography = AppTypography, content = content)
+    MaterialTheme(colorScheme = toolkitColors(palette, isDarkTheme(choice)), typography = AppTypography) {
+        InputFocusArea(Modifier.fillMaxSize(), content)
+    }
 }

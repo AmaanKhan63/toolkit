@@ -66,11 +66,12 @@ import java.io.File
         }
     } }
     if (sheet.isNotBlank()) ModalBottomSheet(onDismissRequest = { sheet = "" }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+      InputFocusArea {
         LazyColumn(Modifier.fillMaxWidth().fillMaxHeight(.85f), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Text(sheet, style = MaterialTheme.typography.titleLarge) }
             when (sheet) {
                 "Search" -> {
-                    item { OutlinedTextField(query, { query = it }, label = { Text("Find text") }, modifier = Modifier.fillMaxWidth(), singleLine = true); PrimaryAction("Search", !searching) { model.find(query) } }
+                    item { ToolkitTextField(query, { query = it }, label = { Text("Find text") }, modifier = Modifier.fillMaxWidth(), singleLine = true); PrimaryAction("Search", !searching) { model.find(query) } }
                     if (searching) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
                     if (!searching && matches.isEmpty()) item { EmptyNote("No matching pages. Scanned PDFs may have no searchable text.") }
                     items(matches) { (index, snippet) -> Surface(onClick = { navigate(index) }, shape = MaterialTheme.shapes.medium) { Column(Modifier.fillMaxWidth().padding(16.dp)) { Text("Page ${index + 1}", style = MaterialTheme.typography.titleSmall); Text(snippet, style = MaterialTheme.typography.bodySmall) } } }
@@ -83,7 +84,7 @@ import java.io.File
                 }
                 else -> {
                     item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedTextField(pageNumber, { pageNumber = it.filter(Char::isDigit).take(4) }, label = { Text("Page number") }, modifier = Modifier.weight(1f), singleLine = true)
+                        ToolkitTextField(pageNumber, { pageNumber = it.filter(Char::isDigit).take(4) }, label = { Text("Page number") }, modifier = Modifier.weight(1f), singleLine = true)
                         TextButton(onClick = { pageNumber.toIntOrNull()?.let { navigate(it - 1) } }, enabled = (pageNumber.toIntOrNull() ?: 0) in 1..state.pages) { Text("Go") }
                     } }
                     items((0 until state.pages).toList()) { index -> Surface(onClick = { navigate(index) }, shape = MaterialTheme.shapes.medium) {
@@ -94,6 +95,7 @@ import java.io.File
                 }
             }
         }
+      }
     }
 }
 @Composable private fun PdfThumbnail(file: File, page: Int) {

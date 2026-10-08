@@ -133,7 +133,7 @@ import java.util.Locale
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Text("Margins", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f)); Text("Link sides", style = MaterialTheme.typography.bodySmall); Switch(linked, { linked = it; if (it) { right = top; bottom = top; left = top; publish() } }, enabled = enabled) }
             @Composable fun Field(label: String, value: String, modifier: Modifier = Modifier, update: (String) -> Unit) {
-                OutlinedTextField(value, { update(it.take(4)); publish() }, label = { Text(label) }, suffix = { Text("px") }, enabled = enabled,
+                ToolkitTextField(value, { update(it.take(4)); publish() }, label = { Text(label) }, suffix = { Text("px") }, enabled = enabled,
                     isError = (value.toIntOrNull() ?: -1) !in 0..160, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true, modifier = modifier)
             }
             if (linked) Field("All sides", top, Modifier.fillMaxWidth()) { top = it; right = it; bottom = it; left = it }

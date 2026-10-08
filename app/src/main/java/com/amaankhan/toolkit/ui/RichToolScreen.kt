@@ -68,13 +68,13 @@ val implementedRichTools = setOf("D06", "D08", "D09", "D10", "D11", "D13", "P15"
                 }) }
                 if (state.inputs.isNotEmpty()) {
                     item { Text(state.inputs.single().name, style = MaterialTheme.typography.titleMedium); OutlinedButton(onClick = ::choose, enabled = !state.busy) { Text("Replace document") } }
-                    if (toolId == "D08") item { OutlinedTextField(sections, { sections = it }, label = { Text("Slides (blank = all)") }, placeholder = { Text("1, 3-5") }, modifier = Modifier.fillMaxWidth()) }
+                    if (toolId == "D08") item { ToolkitTextField(sections, { sections = it }, label = { Text("Slides (blank = all)") }, placeholder = { Text("1, 3-5") }, modifier = Modifier.fillMaxWidth()) }
                     item { ChoiceField("Output pages", if (allPages) "All pages" else "Selected pages", listOf("All pages", "Selected pages"), !state.busy) { allPages = it == "All pages" } }
-                    if (!allPages) item { OutlinedTextField(pages, { pages = it }, label = { Text("Output page selection") }, placeholder = { Text("1, 3-5") }, supportingText = { Text("Applied after laying out the document. Invalid page numbers are rejected.") }, modifier = Modifier.fillMaxWidth()) }
+                    if (!allPages) item { ToolkitTextField(pages, { pages = it }, label = { Text("Output page selection") }, placeholder = { Text("1, 3-5") }, supportingText = { Text("Applied after laying out the document. Invalid page numbers are rejected.") }, modifier = Modifier.fillMaxWidth()) }
                     if (fromPdf) item { PasswordField("Current PDF password (if protected)", password, !state.busy) { password = it } }
                     else if (toolId != "D08") {
-                        item { OutlinedTextField(margin, { margin = it.filter(Char::isDigit).take(3) }, label = { Text("Margins (0–160 px)") }, modifier = Modifier.fillMaxWidth()) }
-                        item { OutlinedTextField(font, { font = it.filter(Char::isDigit).take(2) }, label = { Text("Body text size (8–28 pt)") }, modifier = Modifier.fillMaxWidth()) }
+                        item { ToolkitTextField(margin, { margin = it.filter(Char::isDigit).take(3) }, label = { Text("Margins (0–160 px)") }, modifier = Modifier.fillMaxWidth()) }
+                        item { ToolkitTextField(font, { font = it.filter(Char::isDigit).take(2) }, label = { Text("Body text size (8–28 pt)") }, modifier = Modifier.fillMaxWidth()) }
                     }
                 }
             }
