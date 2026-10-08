@@ -1,0 +1,26 @@
+{
+  "repository": "https://api.github.com/repos/centic9/poi-on-android",
+  "commit": "8e3cf66813feca0eef8283f0865145b4a80c02ee",
+  "paths": [
+    "poishadow/src/main/java/org/apache/poi/java/awt/Color.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/Dimension.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/font/FontRenderContext.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/font/TextLayout.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/geom/AffineTransform.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/geom/Dimension2D.java",
+    "poishadow/src/main/java/org/apache/poi/java/awt/image/BufferedImage.java",
+    "poishadow/src/main/java/org/apache/poi/javax/imageio/ImageIO.java",
+    "poishadow/src/main/java/org/apache/poi/javax/imageio/ImageReader.java",
+    "poishadow/src/main/java/org/apache/poi/javax/imageio/metadata/IIOMetadata.java",
+    "poishadow/src/main/java/org/apache/poi/javax/imageio/stream/ImageInputStream.java",
+    "poishadow/src/main/java/org/dstadler/compat/BmpReader.java",
+    "poishadow/src/main/java/org/dstadler/compat/IOMetadataImpl.java",
+    "poishadow/src/main/java/org/dstadler/compat/ImageInputStreamImpl.java",
+    "poishadow/src/main/java/org/dstadler/compat/JpgReader.java",
+    "poishadow/src/main/java/org/dstadler/compat/PngReader.java"
+  ],
+  "localChanges": [
+    "Color, Dimension and Dimension2D replaced with Toolkit value adapters; remaining compatibility adapters unchanged.",
+    "Shading and dependencies configured in office-runtime/build.gradle.kts; Apache POI 5.5.1."
+  ]
+}

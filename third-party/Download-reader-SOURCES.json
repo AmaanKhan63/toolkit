@@ -1,0 +1,73 @@
+[
+  {
+    "name": "yt-dlp-android",
+    "license": "GPL-3.0",
+    "source": "https://github.com/yausername/youtubedl-android/tree/0.18.1",
+    "license_url": "https://raw.githubusercontent.com/yausername/youtubedl-android/0.18.1/LICENSE",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  {
+    "name": "TDLib-Android",
+    "license": "Apache-2.0",
+    "source": "https://github.com/AkashPriyadarshii/tdlib-android",
+    "license_url": "https://raw.githubusercontent.com/AkashPriyadarshii/tdlib-android/main/LICENSE",
+    "sha256": "4a4db7769cf3a95701958c85e69281f347d01913f6a94967301dc46925a995ac"
+  },
+  {
+    "name": "TDLib",
+    "license": "BSL-1.0",
+    "source": "https://github.com/tdlib/td",
+    "license_url": "https://raw.githubusercontent.com/tdlib/td/master/LICENSE_1_0.txt",
+    "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+  },
+  {
+    "name": "CommonMark",
+    "license": "BSD-2-Clause",
+    "source": "https://github.com/commonmark/commonmark-java/tree/commonmark-parent-0.26.0",
+    "license_url": "https://raw.githubusercontent.com/commonmark/commonmark-java/commonmark-parent-0.26.0/LICENSE.txt",
+    "sha256": "db0ca9fbe898f07ba8a637e6f7b53ce7f8669c67673a8edcf30562e62935e8bb"
+  },
+  {
+    "name": "Jsoup",
+    "license": "MIT",
+    "source": "https://github.com/jhy/jsoup/tree/jsoup-1.23.2",
+    "license_url": "https://raw.githubusercontent.com/jhy/jsoup/jsoup-1.23.2/LICENSE",
+    "sha256": "f5d724c5818010c61bff2e177f5b6452434bc054807522bf241940bca8b1d6b1"
+  },
+  {
+    "name": "aria2",
+    "license": "GPL-2.0-or-later",
+    "source": "https://github.com/aria2/aria2",
+    "license_url": "https://raw.githubusercontent.com/aria2/aria2/master/COPYING",
+    "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643"
+  },
+  {
+    "name": "FFmpeg",
+    "license": "GPL-3.0-or-later",
+    "source": "https://github.com/FFmpeg/FFmpeg/tree/n7.1.1",
+    "license_url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n7.1.1/COPYING.GPLv3",
+    "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "binary_configuration": "Bundled FFmpeg 7.1.1 enables --enable-gpl --enable-version3; verified using -L on x86_64."
+  },
+  {
+    "name": "Python",
+    "license": "PSF-2.0",
+    "source": "https://github.com/python/cpython",
+    "license_url": "https://raw.githubusercontent.com/python/cpython/3.12/LICENSE",
+    "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+  },
+  {
+    "name": "QuickJS",
+    "license": "MIT",
+    "source": "https://github.com/bellard/quickjs",
+    "license_url": "https://raw.githubusercontent.com/bellard/quickjs/master/LICENSE",
+    "sha256": "598fd7fc928e4350abce36e337ba5a1346923c5c692f5be92c3d8e29ddd7c18d"
+  },
+  {
+    "name": "yt-dlp",
+    "license": "Unlicense",
+    "source": "https://github.com/yt-dlp/yt-dlp",
+    "license_url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/master/LICENSE",
+    "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+  }
+]
