@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-07",
+  "version": "0.2.0",
+  "versionCode": 2,
+  "build": "passed",
+  "unitTests": [
+    {
+      "name": "com.amaankhan.toolkit.documents.PageSelectionTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "com.amaankhan.toolkit.documents.PdfLayoutTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "warnings": 28
+  },
+  "androidTests": {
+    "uniqueCases": 14,
+    "initialPassed": 13,
+    "initialFailed": 1,
+    "correctedPageOrderRetest": "passed",
+    "notes": "Text reading order from rotated pages is not a reliable whole-document order assertion. The corrected test independently asserts 90 degree rotation and the exact text on each output page; no app engine code changed for this correction."
+  },
+  "device": {
+    "avd": "ToolkitTest",
+    "api": "36.1",
+    "abi": "x86_64",
+    "gpu": "host (NVIDIA RTX 3060), Vulkan disabled",
+    "ramMb": 3072
+  },
+  "apkSha256": "5805c0b143775090d2b12cd91b2af315a526a99efa352328104bfa89f0a9b962",
+  "apkBytes": 20751452,
+  "physicalDeviceTested": false,
+  "finalBuild": {
+    "tasks": [
+      ":app:assembleDebug",
+      ":app:lintDebug"
+    ],
+    "result": "passed",
+    "log": "final-picker-build.log",
+    "installedWithDataPreserved": true
+  },
+  "finalPickerSmoke": {
+    "result": "passed",
+    "flow": "Protect > Lock / unlock PDF > Choose PDF > tap synthetic PDF immediately returns with one input and password fields",
+    "screenshot": "native-pdf-password-form.png",
+    "fullSuiteRepeatedAfterPickerOnlyChange": false
+  }
+}

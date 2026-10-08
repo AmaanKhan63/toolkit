@@ -1,0 +1,44 @@
+[
+  {
+    "palette": "Platinum dark",
+    "body_on_background": 17.0,
+    "muted_on_surface": 8.12,
+    "button_label": 13.53,
+    "muted_on_container": 6.42
+  },
+  {
+    "palette": "Platinum light",
+    "body_on_background": 15.06,
+    "muted_on_surface": 6.03,
+    "button_label": 14.65,
+    "muted_on_container": 4.85
+  },
+  {
+    "palette": "Champagne dark",
+    "body_on_background": 16.19,
+    "muted_on_surface": 8.2,
+    "button_label": 9.42,
+    "muted_on_container": 6.79
+  },
+  {
+    "palette": "Champagne light",
+    "body_on_background": 13.67,
+    "muted_on_surface": 5.75,
+    "button_label": 6.98,
+    "muted_on_container": 4.55
+  },
+  {
+    "palette": "Jade dark",
+    "body_on_background": 16.36,
+    "muted_on_surface": 8.28,
+    "button_label": 9.08,
+    "muted_on_container": 6.03
+  },
+  {
+    "palette": "Jade light",
+    "body_on_background": 12.6,
+    "muted_on_surface": 5.73,
+    "button_label": 7.67,
+    "muted_on_container": 4.67
+  }
+]

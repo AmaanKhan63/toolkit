@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Same-UID fixture. DocumentsProvider requires exported + the system
+             signature permission; other apps cannot access it. Never in release. -->
+        <provider android:name=".testing.ExportTestProvider" android:authorities="${applicationId}.export-test" android:exported="true" android:permission="android.permission.MANAGE_DOCUMENTS" android:grantUriPermissions="true" />
+    </application>
+</manifest>

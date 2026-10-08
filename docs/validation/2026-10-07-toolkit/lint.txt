@@ -1,0 +1,336 @@
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\TelegramClient.kt:48: Warning: Consider using apply() instead; commit writes its data to persistent storage immediately, whereas apply will handle it in the background [ApplySharedPref]
+    fun clear() { prefs.edit().clear().commit() }
+                                       ~~~~~~~~
+
+   Explanation for issues of type "ApplySharedPref":
+   Consider using apply() instead of commit on shared preferences. Whereas
+   commit blocks and writes its data to persistent storage immediately, apply
+   will handle it in the background.
+
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 36
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application or sdk runs on a version of Android that is more
+   recent than your targetSdk specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdk is
+   less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdk to the highest available value. Then
+   test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+D:\Naya Repos\personal\ToolKit\gradle\wrapper\gradle-wrapper.properties:3: Warning: A newer version of Gradle than 9.3.1 is available: 9.8.0 [AndroidGradlePluginVersion]
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:43: Warning: A newer version of androidx.activity:activity-compose than 1.10.1 is available: 1.13.0 [GradleDependency]
+    implementation("androidx.activity:activity-compose:1.10.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:47: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.8.7 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:48: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.8.7 is available: 2.11.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:49: Warning: A newer version of androidx.datastore:datastore-preferences than 1.1.7 is available: 1.2.1 [GradleDependency]
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:50: Warning: A newer version of androidx.room:room-runtime than 2.7.0 is available: 2.8.5 [GradleDependency]
+    implementation("androidx.room:room-runtime:2.7.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:51: Warning: A newer version of androidx.room:room-ktx than 2.7.0 is available: 2.8.5 [GradleDependency]
+    implementation("androidx.room:room-ktx:2.7.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:52: Warning: A newer version of androidx.room:room-compiler than 2.7.0 is available: 2.8.5 [GradleDependency]
+    ksp("androidx.room:room-compiler:2.7.0")
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:53: Warning: A newer version of androidx.exifinterface:exifinterface than 1.3.7 is available: 1.4.2 [GradleDependency]
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:54: Warning: A newer version of androidx.core:core-ktx than 1.15.0 is available: 1.19.1 [GradleDependency]
+    implementation("androidx.core:core-ktx:1.15.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:57: Warning: A newer version of androidx.documentfile:documentfile than 1.0.1 is available: 1.1.0 [GradleDependency]
+    implementation("androidx.documentfile:documentfile:1.0.1")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:62: Warning: A newer version of org.commonmark:commonmark than 0.26.0 is available: 0.30.0 [NewerVersionAvailable]
+    implementation("org.commonmark:commonmark:0.26.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:63: Warning: A newer version of org.commonmark:commonmark-ext-gfm-tables than 0.26.0 is available: 0.30.0 [NewerVersionAvailable]
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.26.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:64: Warning: A newer version of org.commonmark:commonmark-ext-gfm-strikethrough than 0.26.0 is available: 0.30.0 [NewerVersionAvailable]
+    implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.26.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+D:\Naya Repos\personal\ToolKit\app\build.gradle.kts:19: Warning: Missing x86_64 ABI support for ChromeOS [ChromeOsAbiSupport]
+            ndk { abiFilters += abi }
+                                ~~~
+
+   Explanation for issues of type "ChromeOsAbiSupport":
+   To properly support ChromeOS, your Android application should have an x86
+   and/or x86_64 binary as part of the build configuration. To fix the issue,
+   ensure your files are properly optimized for ARM; the binary translator
+   will then ensure compatibility with x86. Alternatively, add an abiSplit for
+   x86 within your build.gradle file and create the required x86
+   dependencies.
+
+   https://developer.android.com/ndk/guides/abis
+
+C:\Users\amank\.gradle\caches\modules-2\files-2.1\org.bouncycastle\bcpkix-jdk15to18\1.72\32faf4d74dbc333fb3a7a6c80c30417cf888fc7a\bcpkix-jdk15to18-1.72.jar: Warning: checkClientTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+C:\Users\amank\.gradle\caches\modules-2\files-2.1\org.bouncycastle\bcpkix-jdk15to18\1.72\32faf4d74dbc333fb3a7a6c80c30417cf888fc7a\bcpkix-jdk15to18-1.72.jar: Warning: checkClientTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+C:\Users\amank\.gradle\caches\modules-2\files-2.1\org.bouncycastle\bcpkix-jdk15to18\1.72\32faf4d74dbc333fb3a7a6c80c30417cf888fc7a\bcpkix-jdk15to18-1.72.jar: Warning: checkServerTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+D:\Naya Repos\personal\ToolKit\office-runtime\build\libs\office-runtime-android.jar: Warning: checkClientTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+D:\Naya Repos\personal\ToolKit\office-runtime\build\libs\office-runtime-android.jar: Warning: checkServerTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+
+   Explanation for issues of type "TrustAllX509TrustManager":
+   This check looks for X509TrustManager implementations whose
+   checkServerTrusted or checkClientTrusted methods do nothing (thus trusting
+   any certificate chain) which could result in insecure network traffic
+   caused by trusting arbitrary TLS/SSL certificates presented by peers.
+
+   https://goo.gle/TrustAllX509TrustManager
+
+D:\Naya Repos\personal\ToolKit\app\src\main\res\mipmap-anydpi-v26: Warning: This folder configuration (v26) is unnecessary; minSdkVersion is 26. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\ImagePdfEngine.kt:31: Warning: Consider also using StorageManager#getAllocatableBytes and allocateBytes which will consider clearable cached data [UsableSpace]
+        if (stagingDirectory.usableSpace < 64L * 1024 * 1024) throw IOException("Free at least 64 MB of storage and try again.")
+                             ~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\OfficeEngine.kt:89: Warning: Consider also using StorageManager#getAllocatableBytes and allocateBytes which will consider clearable cached data [UsableSpace]
+                require(directory.usableSpace > 128L * 1024 * 1024) { "Free at least 128 MB of storage and try again." }
+                                  ~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfToolEngine.kt:55: Warning: Consider also using StorageManager#getAllocatableBytes and allocateBytes which will consider clearable cached data [UsableSpace]
+                if (directory.usableSpace < 64L * 1024 * 1024) throw IOException("Free at least 64 MB of storage and try again.")
+                              ~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfToolEngine.kt:164: Warning: Consider also using StorageManager#getAllocatableBytes and allocateBytes which will consider clearable cached data [UsableSpace]
+                                                if (directory.usableSpace < 32L * 1024 * 1024) throw IOException("Temporary storage is full. Try fewer pages.")
+                                                              ~~~~~~~~~~~
+
+   Explanation for issues of type "UsableSpace":
+   When you need to allocate disk space for large files, consider using the
+   new allocateBytes(FileDescriptor, long) API, which will automatically clear
+   cached files belonging to other apps (as needed) to meet your request.
+
+   When deciding if the device has enough disk space to hold your new data,
+   call getAllocatableBytes(UUID) instead of using getUsableSpace(), since the
+   former will consider any cached data that the system is willing to clear on
+   your behalf.
+
+   Note that these methods require API level 26. If your app is running on
+   older devices, you will probably need to use both APIs, conditionally
+   switching on Build.VERSION.SDK_INT. Lint only looks in the same compilation
+   unit to see if you are already using both APIs, so if it warns even though
+   you are already using the new API, consider moving the calls to the same
+   file or suppressing the warning.
+
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\DocumentActions.kt:59: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        val uri = Uri.parse(file.uri)
+                  ~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\DownloadService.kt:114: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val uri = Uri.parse(entry.pendingUri)
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\DownloadService.kt:127: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        val tree = DocumentFile.fromTreeUri(this, Uri.parse(entry.destination)) ?: error("Choose a valid destination folder.")
+                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\DownloadStore.kt:48: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        set(value) { prefs.edit().putString("folder", value).apply() }
+                     ~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\DownloadStore.kt:51: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        set(value) { prefs.edit().putLong("limit", value.coerceIn(0, 1_000_000)).apply() }
+                     ~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\DownloadsScreen.kt:182: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                        else Uri.parse(url).lastPathSegment?.takeIf(String::isNotBlank) ?: "download.bin"
+                             ~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\ExtraPdfEngine.kt:30: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+    private fun open(source: String) = Uri.parse(source).let { if (it.scheme == "file") File(requireNotNull(it.path)).inputStream() else context.contentResolver.openInputStream(it) ?: error("File access expired.") }
+                                       ~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\ExtraPdfEngine.kt:59: Warning: Use the KTX extension function Bitmap.scale instead? [UseKtx]
+                                            val scaled = if (scale < 1f) Bitmap.createScaledBitmap(bitmap, (bitmap.width * scale).toInt().coerceAtLeast(1), (bitmap.height * scale).toInt().coerceAtLeast(1), true) else bitmap
+                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\ImagePdfEngine.kt:41: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                    val bitmap = decodeImage(resolver, Uri.parse(image.uri), PdfLayout.decodeEdge(images.size))
+                                                       ~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\ImagesToPdfScreen.kt:150: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+    val bitmap by produceState<Bitmap?>(null, uri) { value = withContext(Dispatchers.IO) { runCatching { ImagePdfEngine.decodeImage(resolver, Uri.parse(uri), 240) }.getOrNull() } }
+                                                                                                                                              ~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\LocalDocumentReader.kt:43: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+    fun name(source: String): String = Uri.parse(source).let { uri ->
+                                       ~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\LocalDocumentReader.kt:46: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+    private fun open(source: String): InputStream = Uri.parse(source).let { uri -> if (uri.scheme == "file") File(requireNotNull(uri.path)).inputStream() else context.contentResolver.openInputStream(uri) ?: error("This file is no longer accessible.") }
+                                                    ~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\OfficeEngine.kt:91: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                val uri = Uri.parse(request.source)
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\OfficeEngine.kt:296: Warning: Use the KTX extension function Canvas.withClip instead? [UseKtx]
+                                            canvas.save(); canvas.clipRect(x + 3, y + 3, x + width - 3, y + 4 + textHeight)
+                                            ~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfOfficeEngine.kt:33: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+            val source = Uri.parse(request.source)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfOfficeEngine.kt:51: Warning: Use the KTX function createBitmap instead? [UseKtx]
+                                val bitmap = Bitmap.createBitmap((page.width * scale).toInt().coerceAtLeast(1), (page.height * scale).toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\PdfPreview.kt:47: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                val source = Uri.parse(uri)
+                             ~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\PdfPreview.kt:54: Warning: Use the KTX function createBitmap instead? [UseKtx]
+                        val bitmap = Bitmap.createBitmap((pdfPage.width * scale).roundToInt().coerceAtLeast(1), (pdfPage.height * scale).roundToInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\PdfReaderModel.kt:32: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                    val uri = Uri.parse(source)
+                              ~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfToolEngine.kt:40: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        val uri = Uri.parse(source)
+                  ~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\PdfToolEngine.kt:170: Warning: Use the KTX function createBitmap instead? [UseKtx]
+                                                    val bitmap = android.graphics.Bitmap.createBitmap((page.width * scale).toInt().coerceAtLeast(1), (page.height * scale).toInt().coerceAtLeast(1), android.graphics.Bitmap.Config.ARGB_8888)
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\PdfToolScreen.kt:68: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+    DisposableEffect(asset) { val old = asset; onDispose { if (old.startsWith("file:")) Uri.parse(old).path?.let { java.io.File(it).delete() } } }
+                                                                                        ~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\PdfViewerScreen.kt:62: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+                        preferences.edit().putStringSet(bookmarkKey, bookmarks.map(Int::toString).toSet()).apply()
+                        ~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\PdfViewerScreen.kt:104: Warning: Use the KTX function createBitmap instead? [UseKtx]
+            val scale = 180f / maxOf(p.width, p.height); val image = Bitmap.createBitmap((p.width * scale).toInt().coerceAtLeast(1), (p.height * scale).toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
+                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\ScanEngine.kt:38: Warning: Use the KTX function createBitmap instead? [UseKtx]
+        val output = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\SignaturePad.kt:38: Warning: Use the KTX function createBitmap instead? [UseKtx]
+                val bitmap = Bitmap.createBitmap(1200, 600, Bitmap.Config.ARGB_8888)
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:37: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+        canvas.drawColor(Color.parseColor(background))
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:48: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                if (shape.fill.isNotBlank()) { paint.color = Color.parseColor(shape.fill); outline() }
+                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:48: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                if (shape.fill.isNotBlank()) { paint.color = Color.parseColor(shape.fill); outline() }
+                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:49: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                if (shape.stroke.isNotBlank()) { paint.color = Color.parseColor(shape.stroke); paint.style = Paint.Style.STROKE; paint.strokeWidth = 1f; outline() }
+                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:49: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                if (shape.stroke.isNotBlank()) { paint.color = Color.parseColor(shape.stroke); paint.style = Paint.Style.STROKE; paint.strokeWidth = 1f; outline() }
+                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:62: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                    val ink = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor(shape.color); textSize = shape.fontSize; typeface = Typeface.create("sans-serif", Typeface.NORMAL) }
+                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\documents\SlideLayout.kt:62: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+                    val ink = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor(shape.color); textSize = shape.fontSize; typeface = Typeface.create("sans-serif", Typeface.NORMAL) }
+                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\TelegramClient.kt:46: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        check(prefs.edit().putString("envelope", Base64.encodeToString(encrypted, Base64.NO_WRAP)).commit()) { "Unable to save this connection." }
+              ~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\downloads\TelegramClient.kt:48: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+    fun clear() { prefs.edit().clear().commit() }
+                  ~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ui\TelegramScreen.kt:72: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                    item { OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://my.telegram.org/apps"))) }, modifier = Modifier.fillMaxWidth()) { Text("Open Telegram API settings") } }
+                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+D:\Naya Repos\personal\ToolKit\app\src\main\java\com\amaankhan\toolkit\ToolkitViewModel.kt:71: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+        try { resolver.releasePersistableUriPermission(Uri.parse(uri), Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
+                                                       ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseKtx":
+   The Android KTX libraries decorates the Android platform SDK as well as
+   various libraries with more convenient extension functions available from
+   Kotlin, allowing you to use default parameters, named parameters, and
+   more.
+
+   Available options:
+
+   **remove-defaults** (default is true):
+   Whether to skip arguments that match the defaults provided by the extension.
+
+   Extensions often provide default values for some of the parameters. For example:
+   ```kotlin
+   fun Path.readLines(charset: Charset = Charsets.UTF_8): List<String> { return Files.readAllLines(this, charset) }
+   ```
+   This lint check will by default automatically omit parameters that match the default, so if your code was calling
+
+   ```kotlin
+   Files.readAllLines(file, Charset.UTF_8)
+   ```
+   lint would replace this with
+   ```kotlin
+   file.readLines()
+   ```
+   rather than
+
+   ```kotlin
+   file.readLines(Charset.UTF_8
+   ```
+   You can turn this behavior off using this option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="remove-defaults" value="true" />
+       </issue>
+   </lint>
+   ```
+
+   **require-present** (default is true):
+   Whether to only offer extensions already available.
+
+   This option lets you only have lint suggest extension replacements if those extensions are already available on the class path (in other words, you're already depending on the library containing the extension method.)
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="require-present" value="true" />
+       </issue>
+   </lint>
+   ```
+
+0 errors, 64 warnings

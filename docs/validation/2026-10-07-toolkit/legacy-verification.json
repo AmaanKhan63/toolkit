@@ -1,0 +1,10 @@
+{
+  "unlocked.xls": {
+    "cellA1": "Legacy protected content",
+    "pass": true
+  },
+  "independently-decrypted.xls": {
+    "cellA1": "Legacy protected content",
+    "pass": true
+  }
+}

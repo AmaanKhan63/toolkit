@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-08",
+  "version": "0.4.0",
+  "versionCode": 4,
+  "package": "com.amaankhan.toolkit",
+  "apkSha256": "517a494e209d711f4d3e7b12332ed60cc50bda4163991ed7098bfe2e3b4013f7",
+  "signerSha256": "4b77fbe0a667261fcae9d34a9dcd78d2b8ef625553f0de7c61f9653314e61bb7",
+  "build": "passed",
+  "jvmPassed": 12,
+  "native": {
+    "engineIntegrationPassed": 45,
+    "uiFinalPassed": 9,
+    "optionalLiveSkipped": 1,
+    "basis": "Engine results from native-initial.txt; all affected UI cases rerun in ui-final.txt. Initial failures retained for transparency."
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 64
+  },
+  "review": {
+    "emulator": "ToolkitTest",
+    "api": "36.1",
+    "abi": "x86_64",
+    "narrowWidthDp": 320,
+    "largeFontScale": 1.3,
+    "nativeScreens": 30,
+    "syntheticDocumentFixtures": 7
+  },
+  "deferredByUser": [
+    "Telegram real-account login/browsing/download/sign-out",
+    "Physical camera, ARM device and OEM behavior"
+  ],
+  "remainingBoundaries": [
+    "Minimum API native execution not verified",
+    "Complex Microsoft Office fidelity remains a documented subset",
+    "Broader media sites, public-peer torrents and third-party providers not comprehensively validated",
+    "No signed production release or repository push"
+  ]
+}

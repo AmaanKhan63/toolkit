@@ -1,0 +1,34 @@
+{
+  "version": "0.4.0",
+  "versionCode": 4,
+  "applicationId": "com.amaankhan.toolkit",
+  "apk": "app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "bytes": 296598080,
+  "sha256": "7e4463edbea0961f81644fe619a31f3ddd5bb73f056b643ebdbc28444f618f90",
+  "jvm": [
+    {
+      "name": "com.amaankhan.toolkit.documents.PageSelectionTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.amaankhan.toolkit.documents.PdfLayoutTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "emulator": "ToolkitTest / API 36.1 / x86_64 / emulator-5556",
+  "status": "Paused at user request; HTML viewer content verification and broader device/account validation remain.",
+  "instrumentation": {
+    "cases": 52,
+    "passed": 50,
+    "failed": 1,
+    "skipped": 1,
+    "openFailure": "DocumentViewerTest local HTML DOM text assertion",
+    "separateLiveSiteInspection": "passed"
+  }
+}

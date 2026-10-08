@@ -1,0 +1,40 @@
+{
+  "origin": "Synthetic local fixtures authored for Toolkit UI review; no user or account data",
+  "files": [
+    {
+      "file": "Toolkit-review.csv",
+      "sha256": "90eac7b18f62f033aba954f470ddca707ab3505f97031ca8e9fcfe3278a1fff7",
+      "bytes": 70
+    },
+    {
+      "file": "Toolkit-review.docx",
+      "sha256": "f05b0abfd0ea10e52bd36e1a7fd02018904387f7dbad25a56a5e0b8d4e10b09d",
+      "bytes": 37026
+    },
+    {
+      "file": "Toolkit-review.epub",
+      "sha256": "f2c3d16404021ac1d4c53999046292cadb0264b19df89eb8b763267c6676a667",
+      "bytes": 1351
+    },
+    {
+      "file": "Toolkit-review.html",
+      "sha256": "bab3e98df2b2d6922126836df7dc0ac3ab31ceee63067e202cb0b9c40e81b25c",
+      "bytes": 203
+    },
+    {
+      "file": "Toolkit-review.md",
+      "sha256": "2014dffcd7ad52ff81b208a8873cdb11d08ad1c4f43123278cd1a796d37f2c7a",
+      "bytes": 148
+    },
+    {
+      "file": "Toolkit-review.pptx",
+      "sha256": "d4603ca74c7905904f745c86d535fc0e13940a6c0f57ed3cc59828fd92b6cfff",
+      "bytes": 29638
+    },
+    {
+      "file": "Toolkit-review.xlsx",
+      "sha256": "56585abcc1de717c47449cfd3a871b17b1ff306763b5d5574cf668c0256f2221",
+      "bytes": 5406
+    }
+  ]
+}

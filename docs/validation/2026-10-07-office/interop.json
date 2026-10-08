@@ -1,0 +1,9 @@
+{
+  "nativeEncryptionReadBy": "msoffcrypto",
+  "passwordVerified": true,
+  "integrityVerified": true,
+  "exactOriginalBytes": true,
+  "cellValuesVerifiedWith": "openpyxl",
+  "plaintextSha256": "253a4bb6f949b0c47b4c176be4797038c676a6d8af26856838456d405b1a69e5",
+  "encryptedSha256": "d61c712f217ae1072ccf1e0789206b268e38b0738306e201b67e69c43326bb85"
+}

@@ -1,0 +1,28 @@
+{
+  "pages": 2,
+  "pageSizes": [
+    [
+      595.0,
+      842.0
+    ],
+    [
+      595.0,
+      842.0
+    ]
+  ],
+  "centerColors": [
+    [
+      33,
+      112,
+      71
+    ],
+    [
+      36,
+      91,
+      221
+    ]
+  ],
+  "bytes": 13483,
+  "order": "green second input first, blue first input second",
+  "result": "pass"
+}

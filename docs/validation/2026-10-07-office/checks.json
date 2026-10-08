@@ -1,0 +1,42 @@
+{
+  "version": "0.3.0",
+  "versionCode": 3,
+  "build": "passed",
+  "lint": {
+    "errors": 0,
+    "warnings": 34
+  },
+  "unitTests": [
+    {
+      "name": "com.amaankhan.toolkit.documents.PageSelectionTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "com.amaankhan.toolkit.documents.PdfLayoutTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "androidTests": {
+    "tests": 24,
+    "result": "passed",
+    "singleFinalRun": true
+  },
+  "device": {
+    "avd": "ToolkitTest",
+    "serial": "emulator-5556",
+    "api": "36.1",
+    "abi": "x86_64"
+  },
+  "physicalDeviceTested": false,
+  "minimumApiTested": false,
+  "apkSha256": "7a28b1184cb7b3a20a6361012e049809daf81b9eccf3b909629bd43c9e6ae2d0",
+  "apkBytes": 31963906,
+  "nativeUiWorkflowExport": "passed",
+  "savedTemplatesSurviveRestart": true,
+  "passwordsExcludedFromTemplates": true,
+  "abandonedOfficeCacheCleanup": "passed"
+}

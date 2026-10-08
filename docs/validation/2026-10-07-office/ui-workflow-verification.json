@@ -1,0 +1,11 @@
+{
+  "uiFlow": "Choose encrypted XLSX > runtime passwords > Run workflow > actual preview > Save result",
+  "pages": 1,
+  "wrongPasswordRejected": true,
+  "correctPasswordAccepted": true,
+  "contentsVerifiedWith": "PyMuPDF (NFKC normalization for font ligatures)",
+  "encryption": "Standard V5 R6 256-bit AES",
+  "originalInputUnchanged": true,
+  "savedTemplateContainsNoPasswordsOrSourceUris": true,
+  "outputSha256": "2d41cdb23783b010db504b0e34ae8a6960f4f13b6ad6e96bf796473a0148a50d"
+}

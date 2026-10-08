@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.amaankhan.toolkit.documents.PdfLayoutTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-07T13:57:28.594Z" hostname="AMAAN" time="0.023">
+  <properties/>
+  <testcase name="oversizedBatchIsRejected" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.003"/>
+  <testcase name="numericMarginsUseFixedReferencePixelsAndHonorAsymmetry" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.007"/>
+  <testcase name="excessiveMarginsAreRejected" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.001"/>
+  <testcase name="negativePixelMarginIsRejected" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.003"/>
+  <testcase name="totalPixelBudgetScalesWithBatchSize" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.001"/>
+  <testcase name="invalidDimensionsAreRejected" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.0"/>
+  <testcase name="portraitImageFitsWithoutCroppingAndIsCentered" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.002"/>
+  <testcase name="autoLandscapeUsesRotatedPageDimensions" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.0"/>
+  <testcase name="samplingBoundsHugeAndOddImageSizes" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.003"/>
+  <testcase name="forcedPortraitAndLetterAreRespected" classname="com.amaankhan.toolkit.documents.PdfLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
