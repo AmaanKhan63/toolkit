@@ -1,0 +1,33 @@
+# Local configuration, credentials, and signing material
+local.properties
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+*cookies*.txt
+*.session
+*.session-journal
+
+# Android / IDE build output
+.gradle/
+.kotlin/
+**/build/
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local tooling
+node_modules/
+.superdesign/tmp/
+__pycache__/
+.DS_Store
+Thumbs.db
+
+# Machine-local tooling, emulator state and temporary verification artifacts
+.local/
+*.hprof
