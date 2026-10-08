@@ -1,0 +1,17 @@
+{
+  "project": "Apache POI test data",
+  "license": "Apache-2.0",
+  "commit": "ae62bb5116b9aee19ebd5834e3a82066132c9f7f",
+  "files": [
+    {
+      "file": "simple.doc",
+      "source": "https://raw.githubusercontent.com/apache/poi/ae62bb5116b9aee19ebd5834e3a82066132c9f7f/test-data/document/simple.doc",
+      "sha256": "4876e828e62d490fa188c7c4e47013e2e0dfdf02f5903dfd374bc0d2b2049ca1"
+    },
+    {
+      "file": "basic_test_ppt_file.ppt",
+      "source": "https://raw.githubusercontent.com/apache/poi/ae62bb5116b9aee19ebd5834e3a82066132c9f7f/test-data/slideshow/basic_test_ppt_file.ppt",
+      "sha256": "e8fd4c38ad72ce3735acbca0b60dd5870fb60f819c169e3947d166f4f1bcc79d"
+    }
+  ]
+}
