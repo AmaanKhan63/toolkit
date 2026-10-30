@@ -1,6 +1,6 @@
 # Media failure diagnostics
 
-The user requested screenshot-ready errors or an exportable log for the next failure, and asked to stop deep live YouTube investigation. The existing push request remains active; UI approval remains pending.
+The user requested screenshot-ready errors or an exportable log for the next failure, and asked to stop deep live YouTube investigation. The repair branch was published. The user subsequently approved the UI and requested the merge to main and a fresh APK on October 30, 2026.
 
 - Capture a bounded, sanitized engine trace in memory. Include stages, selected stream IDs, retry/error lines, last progress and process exit code. Exclude raw request arguments, cookies, credentials, signed URLs and local filenames.
 - On media download, inspection or save failure, persist a small plain-text report in private non-backed-up app storage. Include app/engine/Android/ABI versions, connectivity type, free storage, requested settings, timing and a report ID. Keep at most 20 reports across retries/restarts.
@@ -9,3 +9,5 @@ The user requested screenshot-ready errors or an exportable log for the next fai
 - Rebuild the phone APK and refresh relevant screenshots, then commit and push the repair branch. Document limitations: a report materially improves diagnosis but cannot guarantee a complete root cause for every external or OS failure.
 
 Validation: 30 JVM tests pass. The final focused native run reports 13 checks (ten executed, three live cases gated), all passing; the compact transfer/report flow also passes. ARM64 APK signature matches 0.4.1. No further live YouTube testing was run. See the repair report and repository screenshot gallery.
+
+Approved delivery: merged to `main`; fresh ARM64 build, 30 JVM checks, lint and signing verification passed. The approved APK and validation record are under `build/distributions/`.

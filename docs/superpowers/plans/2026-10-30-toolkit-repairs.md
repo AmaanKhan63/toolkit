@@ -39,4 +39,6 @@
 - [x] Stop further live YouTube investigation at the user's request; do not infer a file-size cause from a test deadline.
 - [x] Add bounded private media reports, sanitized engine context, screenshot codes/IDs, user-chosen export and recent-report access after retry.
 - [x] Verify local HTTP failures, inspection/save capture, real engine version, retention/export, redaction and recovery guidance; complete safety review.
-- [x] Refresh the compact diagnostics screenshot and prepare the repository review gallery. User approval of the UI remains pending; branch publication is separately authorized.
+- [x] Refresh the compact diagnostics screenshot and prepare the repository review gallery. The user approved the UI and authorized merging to main on October 30, 2026.
+
+Approved delivery: merged to `main`; fresh ARM64 build, 30 JVM checks, lint and signing verification passed. The approved APK and validation record are under `build/distributions/`.

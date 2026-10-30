@@ -1,8 +1,8 @@
 # Toolkit 0.4.2 repairs
 
-Branch: `fix/toolkit-usability-reliability`. Native Kotlin/Compose implementation; package and signing identity preserved.
+Merged into `main` from `fix/toolkit-usability-reliability`. Native Kotlin/Compose implementation; package and signing identity preserved.
 
-**UI approval is pending the user's review.** The [native screenshot gallery](validation/2026-10-30-ui/index.html) contains the proposed screens at standard and compact sizes. Pushing the repair branch is not design approval.
+**UI approved on October 30, 2026.** The user reviewed the [native screenshot gallery](validation/2026-10-30-ui/index.html), accepted the screens and requested the merge to `main` and a fresh APK.
 
 ## Changes corresponding to the reported issues
 
@@ -53,17 +53,18 @@ The [example report](validation/2026-10-30-ui/sample-error-report.txt) was produ
 
 ## Phone artifact
 
-- `build/distributions/Toolkit-0.4.2-arm64-debug.apk` — 104,120,073 bytes.
+- `build/distributions/Toolkit-0.4.2-arm64-debug.apk` — 104,119,893 bytes.
 - Package `com.amaankhan.toolkit`, version `0.4.2`, version code `6`, ABI `arm64-v8a`; min SDK 26, target SDK 36.
 - APK signature verified; SHA-256 signing-certificate digest matches the existing 0.4.1 ARM64 APK.
-- APK SHA-256: `9f0dd8f0c195b7a2e876638893757cae498f5f8bd0491df5f460fba092b71585`.
+- APK SHA-256: `1b6da8588f97237f6471b23886fac6fb681502a22eff18f1f7648c03accb4701`.
+- Fresh rebuild on approved `main`: all 59 Gradle tasks executed; 30 JVM tests passed; lint reported zero errors. APK package, ARM64 architecture and matching signature were verified again. Application/build inputs are identical to the previously tested repair branch.
 - Install over the existing app without uninstalling. The matching debug signing identity supports updates from the earlier delivered debug build; this is not a production-signed release.
 
 ### Compact-screen review
 
 All four revised-flow tests passed at 320dp width (840px at density 420) with system font scale 1.3: image organization/layout, conditional protection, transfer progress/recovery, and Transfers/Files navigation. A test was corrected to scroll the home catalogue before selecting Protect. No production adjustment was needed after this run. After diagnostics were added, the transfer flow was rerun at the same compact settings: `OK (1 test)`, 11.476 seconds, including the report action and recovery controls. The isolated emulator had to be restarted after becoming unresponsive; the rerun passed without an app change. The emulator's size, density and font setting were restored.
 
-Standard and compact native screenshots were visually inspected and are available in the [repository review gallery](validation/2026-10-30-ui/index.html). This inspection is distinct from the user's pending approval. Content scrolls where necessary and actions wrap; screenshots use synthetic inputs.
+Standard and compact native screenshots were visually inspected and are available in the [repository review gallery](validation/2026-10-30-ui/index.html). The user subsequently approved these screens on October 30, 2026. Content scrolls where necessary and actions wrap; screenshots use synthetic inputs.
 
 ## Limits
 

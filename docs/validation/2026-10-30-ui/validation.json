@@ -1,11 +1,11 @@
 {
   "version": "0.4.2",
-  "uiApproval": "awaiting user review",
+  "uiApproval": "approved",
   "versionCode": 6,
   "package": "com.amaankhan.toolkit",
   "abi": "arm64-v8a",
-  "bytes": 104120073,
-  "sha256": "9f0dd8f0c195b7a2e876638893757cae498f5f8bd0491df5f460fba092b71585",
+  "bytes": 104119893,
+  "sha256": "1b6da8588f97237f6471b23886fac6fb681502a22eff18f1f7648c03accb4701",
   "signingCertificateMatches041": true,
   "jvm": {
     "passed": 30
@@ -50,5 +50,15 @@
     "fontScale": 1.3,
     "seconds": 11.476,
     "scope": "transfer progress, report action and recovery controls after emulator restart"
+  },
+  "uiApprovalDate": "2026-10-30",
+  "postMergeRebuild": {
+    "branch": "main",
+    "applicationSourceCommit": "89b4d13ec6ff84339088fd926e856ed7d6aa97b0",
+    "completedAtUtc": "2026-10-30T15:35:25Z",
+    "jvmPassed": 30,
+    "lintErrors": 0,
+    "signingCertificateMatches041": true,
+    "tasksForcedToRerun": true
   }
 }
