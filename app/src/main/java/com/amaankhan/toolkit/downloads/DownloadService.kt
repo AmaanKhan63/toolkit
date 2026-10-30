@@ -100,7 +100,14 @@ class DownloadService : Service() {
             throw e
         } catch (e: Exception) {
             // Upstream stderr can contain signed links. Never show or persist it verbatim.
-            val message = when (e) {
+            val failedEntry = store.dao.get(id)
+            val failure = if (failedEntry?.kind == "VIDEO" && (e !is MediaFailure || e.diagnosticId == null)) {
+                MediaReports.failure(this, e, MediaTrace().apply { stage = if (failedEntry.ready) "saving" else "starting" },
+                    if (failedEntry.ready) "save" else "start", failedEntry.source,
+                    runCatching { JSONObject(failedEntry.options) }.getOrDefault(JSONObject()), failedEntry.bytes)
+            } else e
+            val message = when (failure) {
+                is MediaFailure -> failure.message!!
                 is SecurityException -> "Folder access expired. Choose the destination again and resume."
                 is java.io.IOException -> "Connection or storage failed. Check your network and free space, then retry."
                 else -> if (e.javaClass.name.startsWith("com.yausername")) "Media download failed. The source may be unavailable or need an engine update. Retry or inspect the link again."

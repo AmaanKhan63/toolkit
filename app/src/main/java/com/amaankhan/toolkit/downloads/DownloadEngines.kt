@@ -151,34 +151,46 @@ class DownloadEngines(private val store: DownloadStore) {
         }
     }
     suspend fun video(entry: DownloadEntry, limit: Long) = withContext(Dispatchers.IO) {
-        DownloadRuntime.initialize(context)
+        val trace = MediaTrace()
+        try {
         val directory = store.directory(entry.id)
         val data = File(directory, "data").apply { mkdirs() }
         val settings = JSONObject(entry.options)
         val request = YoutubeDLRequest(entry.source).apply {
             addOption("--ignore-config"); addOption("--no-playlist"); addOption("--no-mtime"); addOption("--restrict-filenames")
-            addOption("--continue"); addOption("--no-overwrites"); addOption("--concurrent-fragments", 8)
-            addOption("--newline"); addOption("--progress"); addOption("--progress-template", "download:TKPROG:%(progress.downloaded_bytes)s:%(progress.total_bytes,progress.total_bytes_estimate)s:%(progress.speed)s:%(progress.eta)s")
+            addOption("--continue"); addOption("--no-overwrites"); addOption("--concurrent-fragments", 1)
+            addOption("--abort-on-unavailable-fragments")
+            addOption("--newline"); addOption("--progress"); addOption("--color", "never")
+            addOption("--progress-template", "download:TKPROG:%(progress.downloaded_bytes)s:%(progress.total_bytes)s:%(progress.total_bytes_estimate)s:%(progress.speed)s:%(progress.eta)s:%(progress.status)s")
             addOption("--paths", data.path); addOption("-o", "%(title).120B [%(id)s].%(ext)s")
+            addOption("--no-simulate")
+            addOption("--print", "before_dl:TKNAME:%(title)j")
             addCommands(listOf("--print-to-file", "after_move:filepath", File(directory, "outputs.txt").path))
             val audio = settings.optString("container") in setOf("mp3", "m4a", "opus")
             val height = settings.optInt("height", 0)
             val selectedFormat = settings.optString("format")
             addOption("-f", if (selectedFormat.isNotBlank()) selectedFormat else if (audio) "bestaudio/best" else if (height > 0) "bv*[height<=$height]+ba/b[height<=$height]" else "bv*+ba/b")
             if (audio) { addOption("-x"); addOption("--audio-format", settings.getString("container")); addOption("--audio-quality", "0") }
-            else if (settings.optString("container") == "mp4") { addOption("--merge-output-format", "mp4"); addOption("--remux-video", "mp4") }
+            else if (settings.optString("container") == "mp4") {
+                // Prefer widely playable codecs without forcing a costly on-device transcode.
+                if (selectedFormat.isBlank()) addOption("-S", "vcodec:h264,acodec:aac")
+                addOption("--merge-output-format", "mp4"); addOption("--remux-video", "mp4")
+            }
             else { addOption("--merge-output-format", "mkv") }
             if (limit > 0) addOption("--limit-rate", limit.toString())
         }
         try {
             var updated = 0L
-            runMedia(context, request) { line ->
-                val now = System.currentTimeMillis()
-                if (line.startsWith("TKPROG:") && now - updated >= 500) {
-                    val values = line.split(':'); val bytes = values.getOrNull(1)?.toDoubleOrNull()?.toLong() ?: 0
-                    val total = values.getOrNull(2)?.toDoubleOrNull()?.toLong() ?: 0; val speed = values.getOrNull(3)?.toDoubleOrNull()?.toLong() ?: 0
-                    val eta = values.getOrNull(4)?.toDoubleOrNull()?.toLong() ?: 0
-                    runBlocking { store.dao.progress(entry.id, bytes, total, speed, if (total > 0) (bytes * 100 / total).toInt().coerceIn(0, 100) else -1, if (eta > 0) "Downloading · ${eta}s remaining" else "Downloading / preparing media") }
+            runMedia(context, request, trace = trace) { line ->
+                if (line.startsWith("TKNAME:")) {
+                    val title = runCatching { org.json.JSONTokener(line.removePrefix("TKNAME:")).nextValue() as? String }
+                        .getOrNull()?.takeIf { it.isNotBlank() }?.let(::safeDownloadName)
+                    if (title != null) runBlocking { store.dao.updateName(entry.id, title) }
+                }
+                val now = android.os.SystemClock.elapsedRealtime()
+                val progress = parseMediaProgress(line)
+                if (progress != null && (now - updated >= 500 || line.endsWith(":finished"))) {
+                    runBlocking { store.dao.progress(entry.id, progress.bytes, progress.total, progress.speed, progress.percent, progress.detail) }
                     updated = now
                 }
             }
@@ -193,10 +205,21 @@ class DownloadEngines(private val store: DownloadStore) {
             }
             store.dao.get(entry.id)?.let { store.dao.update(it.copy(ready = true, files = outputs.toString(), speed = 0, bytes = files.sumOf(File::length), total = files.sumOf(File::length))) }
         } finally { /* runMedia releases the complete process group, including FFmpeg. */ }
+        } catch (e: CancellationException) { throw e }
+        catch (e: Exception) {
+            throw MediaReports.failure(context, e, trace, "download", entry.source,
+                runCatching { JSONObject(entry.options) }.getOrDefault(JSONObject()), entry.bytes)
+        }
     }
     suspend fun inspectVideo(url: String): JSONObject = withContext(Dispatchers.IO) {
-        validateDownloadUrl(url); DownloadRuntime.initialize(context)
-        val request = YoutubeDLRequest(url).apply { addOption("--ignore-config"); addOption("--flat-playlist"); addOption("--dump-single-json"); addOption("--playlist-end", 500); addOption("--socket-timeout", 30) }
-        JSONObject(runMedia(context, request, capture = true))
+        val trace = MediaTrace()
+        try {
+        validateDownloadUrl(url)
+        val request = YoutubeDLRequest(url).apply { addOption("--ignore-config"); addOption("--color", "never"); addOption("--flat-playlist"); addOption("--dump-single-json"); addOption("--playlist-end", 500) }
+        val output = withTimeoutOrNull(90_000) { runMedia(context, request, capture = true, trace = trace) }
+            ?: throw MediaFailure(MediaFailureReason.TIMED_OUT)
+        try { JSONObject(output) } catch (_: org.json.JSONException) { throw MediaFailure(MediaFailureReason.ENGINE) }
+        } catch (e: CancellationException) { throw e }
+        catch (e: Exception) { throw MediaReports.failure(context, e, trace, "inspect", url) }
     }
 }

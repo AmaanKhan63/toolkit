@@ -24,15 +24,29 @@ class DownloadsModel(app: Application) : AndroidViewModel(app) {
     fun inspect(url: String) { if (busy.value) return; busy.value = true; inspection.value = null; action {
         try { inspection.value = DownloadEngines(store).inspectVideo(url) }
         catch (e: CancellationException) { throw e }
+        catch (e: MediaFailure) { error.value = e.message }
         catch (_: Exception) { error.value = "Unable to inspect this link. Check that it is public and supported by yt-dlp." }
         finally { busy.value = false }
     } }
+    fun saveErrorReport(id: String, uri: Uri) = action {
+        try {
+            MediaReports.export(store.context, id, uri)
+            notice.value = "Error report saved. Attach the text file with your screenshot when reporting the problem."
+        } catch (e: CancellationException) { throw e }
+        catch (_: Exception) { error.value = "The error report could not be saved. It may have expired, or the selected location is unavailable. Choose another report or location." }
+    }
+    suspend fun recentErrorReports(): List<Pair<String, Long>> = withContext(Dispatchers.IO) { MediaReports.list(store.context) }
     fun updateMediaEngine() { if (busy.value) return; busy.value = true; action {
         try {
             require(store.dao.all().none { it.kind == "VIDEO" && it.state in setOf("RUNNING", "QUEUED") }) { "Pause media downloads before updating their engine." }
-            DownloadRuntime.initialize(store.context)
-            com.yausername.youtubedl_android.YoutubeDL.getInstance().updateYoutubeDL(store.context)
-            notice.value = "yt-dlp is up to date."
+            val engine = com.yausername.youtubedl_android.YoutubeDL.getInstance()
+            try {
+                DownloadRuntime.initialize(store.context)
+                engine.updateYoutubeDL(store.context)
+                val version = engine.version(store.context)?.takeIf { it.matches(Regex("[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}[A-Za-z0-9._-]*")) }
+                notice.value = if (version == null) "Media engine update completed." else "Media engine is up to date ($version)."
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { error.value = MediaReports.failure(store.context, e, MediaTrace(), "engine update", "").message }
         } finally { busy.value = false }
     } }
     fun queue(kind: DownloadKind, sources: List<Pair<String, String>>, destination: String, options: JSONObject, torrentUri: Uri? = null, onDone: () -> Unit) {

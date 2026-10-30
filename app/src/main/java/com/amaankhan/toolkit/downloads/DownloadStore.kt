@@ -28,6 +28,8 @@ data class DownloadEntry(
     @Query("SELECT * FROM downloads WHERE id=:id") suspend fun get(id: String): DownloadEntry?
     @Insert suspend fun insert(entry: DownloadEntry)
     @Update suspend fun update(entry: DownloadEntry)
+    @Query("UPDATE downloads SET name=:name WHERE id=:id")
+    suspend fun updateName(id: String, name: String)
     @Query("UPDATE downloads SET state=:state, detail=:detail, speed=0, error=:error WHERE id=:id")
     suspend fun state(id: String, state: String, detail: String, error: String = "")
     @Query("UPDATE downloads SET bytes=:bytes,total=:total,speed=:speed,progress=:progress,detail=:detail WHERE id=:id")
