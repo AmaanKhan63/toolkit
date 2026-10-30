@@ -31,15 +31,14 @@ class PdfLayoutTest {
             assertTrue(w / sample <= 1000 && h / sample <= 1000)
         }
     }
-    @Test fun totalPixelBudgetScalesWithBatchSize() {
-        for (count in 1..PdfLayout.MAX_IMAGES) {
-            val edge = PdfLayout.decodeEdge(count)
-            assertTrue(edge.toLong() * edge * count <= PdfLayout.TOTAL_PIXEL_BUDGET)
+    @Test fun largeBatchesKeepTheSameBoundedImageResolution() {
+        for (count in listOf(1, 20, 21, 100, 500)) {
+            assertEquals("Batch size must not make individual pages unreadable", 1800, PdfLayout.decodeEdge(count))
         }
     }
     @Test(expected = IllegalArgumentException::class) fun invalidDimensionsAreRejected() { PdfLayout.fit(0, 20, PdfOptions()) }
     @Test(expected = IllegalArgumentException::class) fun excessiveMarginsAreRejected() { PdfLayout.fit(20, 20, PdfOptions(margin = 600)) }
-    @Test(expected = IllegalArgumentException::class) fun oversizedBatchIsRejected() { PdfLayout.decodeEdge(21) }
+    @Test(expected = IllegalArgumentException::class) fun oversizedBatchIsRejected() { PdfLayout.decodeEdge(501) }
     @Test fun numericMarginsUseFixedReferencePixelsAndHonorAsymmetry() {
         val page = PdfLayout.fit(100, 100, PdfOptions(orientation = Orientation.PORTRAIT, marginsPx = MarginsPx(96, 0, 0, 96)))
         assertEquals(72f, page.left, 0.01f)

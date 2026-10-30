@@ -1,7 +1,6 @@
 package com.amaankhan.toolkit.documents
 
 import kotlin.math.min
-import kotlin.math.sqrt
 
 enum class Paper(val label: String, val width: Int, val height: Int) {
     A4("A4", 595, 842), LETTER("Letter", 612, 792)
@@ -14,11 +13,12 @@ data class PdfOptions(val paper: Paper = Paper.A4, val orientation: Orientation 
 data class PageLayout(val width: Int, val height: Int, val left: Float, val top: Float, val imageWidth: Float, val imageHeight: Float)
 
 object PdfLayout {
-    const val MAX_IMAGES = 20
-    const val TOTAL_PIXEL_BUDGET = 12_000_000
+    const val MAX_IMAGES = 500
+    private const val MAX_DECODE_EDGE = 1800
     fun decodeEdge(count: Int): Int {
         require(count in 1..MAX_IMAGES)
-        return min(1800, sqrt(TOTAL_PIXEL_BUDGET.toDouble() / count).toInt())
+        // Pages are encoded to disk one at a time, so image quality need not shrink with the batch.
+        return MAX_DECODE_EDGE
     }
     fun sampleSize(width: Int, height: Int, edge: Int): Int {
         require(width > 0 && height > 0 && edge > 0)

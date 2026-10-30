@@ -81,6 +81,101 @@ class ImagePdfEngineTest {
         }
     }
 
+    @Test fun texturedJpegStaysCompactAndPreservesExifRotationWhenRendered() = runBlocking {
+        // High-frequency texture exposes accidental expansion of JPEG photos into lossless RGB.
+        // The filename deliberately does not identify the format: selection is MIME-based.
+        val file = File(root, "textured-photo.data")
+        val source = Bitmap.createBitmap(640, 480, Bitmap.Config.ARGB_8888)
+        try {
+            val random = java.util.Random(42)
+            val row = IntArray(640)
+            for (y in 0 until 480) {
+                for (x in row.indices) row[x] = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256))
+                source.setPixels(row, 0, 640, 0, y, 640, 1)
+            }
+            val canvas = android.graphics.Canvas(source)
+            canvas.drawRect(0f, 0f, 160f, 120f, android.graphics.Paint().apply { color = Color.RED })
+            canvas.drawRect(0f, 360f, 160f, 480f, android.graphics.Paint().apply { color = Color.BLUE })
+            file.outputStream().use { assertTrue(source.compress(Bitmap.CompressFormat.JPEG, 95, it)) }
+        } finally { source.recycle() }
+        ExifInterface(file).apply { setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_ROTATE_90.toString()); saveAttributes() }
+        val original = hash(file)
+        val output = engine.create(listOf(selected(file)), PdfOptions()) { _, _ -> }
+        assertTrue("A 640 by 480 JPEG photo should stay below 400 KB in the PDF; got ${output.length()}", output.length() < 400_000)
+        PdfRenderer(ParcelFileDescriptor.open(output, ParcelFileDescriptor.MODE_READ_ONLY)).use { pdf ->
+            pdf.openPage(0).use { page ->
+                assertEquals(595, page.width)
+                assertEquals(842, page.height)
+                val rendered = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+                try {
+                    page.render(rendered, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    val topLeft = rendered.getPixel(90, 150)
+                    val topRight = rendered.getPixel(500, 150)
+                    assertTrue(Color.blue(topLeft) > 220 && Color.red(topLeft) < 30)
+                    assertTrue(Color.red(topRight) > 220 && Color.blue(topRight) < 30)
+                } finally { rendered.recycle() }
+            }
+        }
+        assertEquals(original, hash(file))
+        assertEquals(listOf(output), staging.listFiles()?.toList())
+    }
+
+    @Test fun fiveHundredImagesRenderInSelectionOrderAndReleaseScratchStorage() = runBlocking {
+        val colors = List(500) { index -> Color.rgb(index % 256, index / 256 * 127, 255 - index % 256) }
+        val inputs = colors.mapIndexed { index, color -> image("page-$index.png", 12, 24, color) }
+        var completedPages = 0
+        var diskStorageObserved = false
+        val output = engine.create(inputs.map(::selected), PdfOptions()) { done, total ->
+            assertEquals(500, total)
+            completedPages = done
+            if (done > 0) {
+                diskStorageObserved = diskStorageObserved || staging.walkTopDown().any { it.isFile && it.extension != "pdf" && it.length() > 0 }
+            }
+        }
+        assertEquals(500, completedPages)
+        assertTrue("Image content must spill to temporary disk storage during assembly", diskStorageObserved)
+        PdfRenderer(ParcelFileDescriptor.open(output, ParcelFileDescriptor.MODE_READ_ONLY)).use { pdf ->
+            assertEquals(500, pdf.pageCount)
+            colors.forEachIndexed { index, expected ->
+                pdf.openPage(index).use { page ->
+                    val rendered = Bitmap.createBitmap(60, 85, Bitmap.Config.ARGB_8888)
+                    try {
+                        page.render(rendered, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        assertEquals("Selected image order at page ${index + 1}", expected, rendered.getPixel(30, 42))
+                        assertEquals(Color.WHITE, rendered.getPixel(0, 0))
+                    } finally { rendered.recycle() }
+                }
+            }
+        }
+        assertEquals(listOf(output), staging.listFiles()?.toList())
+    }
+
+    @Test fun transparentImagesAndAsymmetricMarginsRenderOverWhite() = runBlocking {
+        val file = File(root, "transparent.png")
+        val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        try {
+            bitmap.eraseColor(Color.TRANSPARENT)
+            val canvas = android.graphics.Canvas(bitmap)
+            canvas.drawRect(50f, 0f, 100f, 100f, android.graphics.Paint().apply { color = Color.BLUE })
+            canvas.drawRect(0f, 50f, 50f, 100f, android.graphics.Paint().apply { color = Color.argb(128, 255, 0, 0) })
+            file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        } finally { bitmap.recycle() }
+        val output = engine.create(listOf(selected(file)), PdfOptions(orientation = Orientation.PORTRAIT, marginsPx = MarginsPx(96, 0, 0, 96))) { _, _ -> }
+        PdfRenderer(ParcelFileDescriptor.open(output, ParcelFileDescriptor.MODE_READ_ONLY)).use { pdf ->
+            pdf.openPage(0).use { page ->
+                val rendered = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+                try {
+                    page.render(rendered, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    assertEquals(Color.WHITE, rendered.getPixel(100, 300))
+                    assertEquals(Color.rgb(255, 127, 127), rendered.getPixel(100, 600))
+                    assertEquals(Color.BLUE, rendered.getPixel(500, 300))
+                    assertEquals(Color.WHITE, rendered.getPixel(500, 190))
+                    assertEquals(Color.BLUE, rendered.getPixel(500, 200))
+                } finally { rendered.recycle() }
+            }
+        }
+    }
+
     @Test fun allExifTransformsMatchCornerMapping() {
         val file = File(root, "corners.jpg")
         val bitmap = Bitmap.createBitmap(80, 40, Bitmap.Config.ARGB_8888)
@@ -123,5 +218,41 @@ class ImagePdfEngineTest {
         assertTrue(conversion.isCancelled)
         assertTrue(staging.listFiles().isNullOrEmpty())
         assertEquals(before, hash(file))
+    }
+
+    @Test fun cancellationAfterFormerLimitRemovesDiskBackedPagesAndOutput() = runBlocking {
+        val file = image("cancel-large-batch.png", 1000, 1500, Color.BLUE)
+        val before = hash(file)
+        var completedPages = 0
+        var diskStorageObserved = false
+        val conversion = launch {
+            val caller: Job = coroutineContext[Job]!!
+            engine.create(List(500) { selected(file) }, PdfOptions()) { page, _ ->
+                completedPages = page
+                if (page == 25) {
+                    diskStorageObserved = staging.walkTopDown().any { it.isFile && it.extension != "pdf" && it.length() > 0 }
+                    caller.cancel()
+                }
+            }
+        }
+        conversion.join()
+        assertEquals(25, completedPages)
+        assertTrue(diskStorageObserved)
+        assertTrue(conversion.isCancelled)
+        assertTrue("Scratch files and partial output must both be removed", staging.listFiles().isNullOrEmpty())
+        assertEquals(before, hash(file))
+    }
+
+    @Test fun invalidImageAfterFormerLimitRemovesDiskBackedPagesAndOutput() = runBlocking {
+        val valid = image("valid.png", 12, 24, Color.RED)
+        val corrupt = File(root, "broken-later.png").apply { writeText("not an image") }
+        var completedPages = 0
+        try {
+            engine.create(List(21) { selected(valid) } + selected(corrupt), PdfOptions()) { done, _ -> completedPages = done }
+            fail("Should reject the corrupt image")
+        } catch (_: IOException) {
+            assertEquals(21, completedPages)
+            assertTrue(staging.listFiles().isNullOrEmpty())
+        }
     }
 }

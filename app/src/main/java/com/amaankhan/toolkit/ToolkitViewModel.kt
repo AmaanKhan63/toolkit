@@ -35,6 +35,7 @@ enum class RunPhase { IDLE, READING, CREATING, READY, SAVING, SAVED }
 data class ComposerState(
     val images: List<SelectedImage> = emptyList(), val options: PdfOptions = PdfOptions(),
     val phase: RunPhase = RunPhase.IDLE, val progress: Int = 0, val message: String? = null,
+    val importTotal: Int = 0,
     val prepared: File? = null, val saved: ExportedDocument? = null,
 ) { val busy get() = phase in setOf(RunPhase.READING, RunPhase.CREATING, RunPhase.SAVING) }
 
@@ -52,7 +53,10 @@ class ToolkitViewModel(application: Application) : AndroidViewModel(application)
     private var operation: Job? = null
     // Sequential startup cleanup completes before any new conversion is allowed to use staging.
     private val cleanup = viewModelScope.launch(Dispatchers.IO) {
-        staging.listFiles()?.filter { it.isFile && it.name.startsWith("images-") && it.extension == "pdf" }?.forEach { it.delete() }
+        staging.listFiles()?.forEach { file ->
+            if (file.isFile && file.name.startsWith("images-") && file.extension == "pdf") file.delete()
+            else if (file.isDirectory && file.name.startsWith("images-work-")) file.deleteRecursively()
+        }
     }
 
     fun setTheme(theme: ThemeChoice) = preferenceAction { app.preferences.setTheme(theme) }
@@ -79,17 +83,22 @@ class ToolkitViewModel(application: Application) : AndroidViewModel(application)
     fun addImages(uris: List<Uri>) {
         if (_composer.value.busy || uris.isEmpty()) return
         val prior = _composer.value
-        val additions = uris.distinct().filter { uri -> prior.images.none { it.uri == uri.toString() } }
+        val knownUris = prior.images.mapTo(HashSet()) { it.uri }
+        val additions = uris.filter { knownUris.add(it.toString()) }
         if (prior.images.size + additions.size > PdfLayout.MAX_IMAGES) {
             _composer.update { it.copy(message = "Choose up to ${PdfLayout.MAX_IMAGES} images per PDF. No new images were added.") }; return
         }
         if (additions.isEmpty()) return
         operation = viewModelScope.launch {
-            _composer.update { it.copy(phase = RunPhase.READING, message = null) }
+            _composer.update { it.copy(phase = RunPhase.READING, progress = 0, importTotal = additions.size, message = null) }
             try {
-                val selected = withContext(Dispatchers.IO) { additions.map { uri ->
+                val selected = withContext(Dispatchers.IO) { additions.mapIndexed { index, uri ->
                     currentCoroutineContext().ensureActive()
-                    SelectedImage(uri.toString(), displayName(uri, "Image ${prior.images.size + additions.indexOf(uri) + 1}"))
+                    try { resolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                    catch (_: SecurityException) { /* Some providers offer session-only access. */ }
+                    SelectedImage(uri.toString(), displayName(uri, "Image ${prior.images.size + index + 1}")).also {
+                        _composer.update { state -> state.copy(progress = index + 1) }
+                    }
                 } }
                 invalidatePrepared()
                 _composer.update { it.copy(images = prior.images + selected, phase = RunPhase.IDLE) }

@@ -5,15 +5,22 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.exifinterface.media.ExifInterface
+import com.tom_roush.pdfbox.cos.COSName
+import com.tom_roush.pdfbox.io.MemoryUsageSetting
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.pdmodel.PDPage
+import com.tom_roush.pdfbox.pdmodel.PDPageContentStream
+import com.tom_roush.pdfbox.pdmodel.common.PDRectangle
+import com.tom_roush.pdfbox.pdmodel.graphics.color.PDDeviceRGB
+import com.tom_roush.pdfbox.pdmodel.graphics.image.PDImageXObject
 import java.io.File
+import java.io.FilterOutputStream
 import java.io.IOException
+import java.nio.file.Files
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -25,52 +32,133 @@ data class SelectedImage(val uri: String, val name: String)
 class ImagePdfEngine(private val resolver: ContentResolver, private val stagingDirectory: File) {
     suspend fun create(images: List<SelectedImage>, options: PdfOptions, progress: (Int, Int) -> Unit): File {
         var staged: File? = null
-        try { return withContext(Dispatchers.IO) {
-        require(images.size in 1..PdfLayout.MAX_IMAGES) { "Choose between 1 and ${PdfLayout.MAX_IMAGES} images." }
-        if (!stagingDirectory.exists() && !stagingDirectory.mkdirs()) throw IOException("Temporary storage is unavailable.")
-        if (stagingDirectory.usableSpace < 64L * 1024 * 1024) throw IOException("Free at least 64 MB of storage and try again.")
-        val output = File.createTempFile("images-", ".pdf", stagingDirectory)
-        staged = output
-        var completed = false
         try {
-            val document = PdfDocument()
-            try {
-                images.forEachIndexed { index, image ->
+            return withContext(Dispatchers.IO) {
+                require(images.size in 1..PdfLayout.MAX_IMAGES) { "Choose between 1 and ${PdfLayout.MAX_IMAGES} images." }
+                if (!stagingDirectory.exists() && !stagingDirectory.mkdirs()) throw IOException("Temporary storage is unavailable.")
+                if (stagingDirectory.usableSpace < 64L * 1024 * 1024) throw IOException("Free at least 64 MB of storage and try again.")
+                val output = File.createTempFile("images-", ".pdf", stagingDirectory)
+                staged = output
+                val scratch = Files.createTempDirectory(stagingDirectory.toPath(), "images-work-").toFile()
+                var completed = false
+                try {
+                    // All accumulated image/content streams use private disk storage. Only the
+                    // current bounded bitmap and its scanline buffers stay in image memory.
+                    PDDocument(MemoryUsageSetting.setupTempFileOnly().setTempDir(scratch)).use { document ->
+                        images.forEachIndexed { index, image ->
+                            currentCoroutineContext().ensureActive()
+                            progress(index, images.size)
+                            val decoded = decodeImageData(resolver, Uri.parse(image.uri), PdfLayout.decodeEdge(images.size))
+                            val bitmap = decoded.bitmap
+                            try {
+                                val layout = PdfLayout.fit(bitmap.width, bitmap.height, options)
+                                val page = PDPage(PDRectangle(layout.width.toFloat(), layout.height.toFloat()))
+                                document.addPage(page)
+                                val embedded = embedImage(document, bitmap, decoded.jpeg)
+                                PDPageContentStream(document, page).use { content ->
+                                    content.setNonStrokingColor(1f, 1f, 1f)
+                                    content.addRect(0f, 0f, layout.width.toFloat(), layout.height.toFloat())
+                                    content.fill()
+                                    // Layout uses top-left coordinates; PDF uses bottom-left.
+                                    content.drawImage(embedded, layout.left, layout.height - layout.top - layout.imageHeight, layout.imageWidth, layout.imageHeight)
+                                }
+                            } finally { bitmap.recycle() }
+                            progress(index + 1, images.size)
+                        }
+                        val jobContext = currentCoroutineContext()
+                        jobContext.ensureActive()
+                        output.outputStream().buffered().use { destination ->
+                            document.save(object : FilterOutputStream(destination) {
+                                override fun write(value: Int) { jobContext.ensureActive(); out.write(value) }
+                                override fun write(bytes: ByteArray, offset: Int, length: Int) {
+                                    jobContext.ensureActive()
+                                    out.write(bytes, offset, length)
+                                }
+                            })
+                        }
+                    }
                     currentCoroutineContext().ensureActive()
-                    progress(index, images.size)
-                    val bitmap = decodeImage(resolver, Uri.parse(image.uri), PdfLayout.decodeEdge(images.size))
-                    try {
-                        val layout = PdfLayout.fit(bitmap.width, bitmap.height, options)
-                        val page = document.startPage(PdfDocument.PageInfo.Builder(layout.width, layout.height, index + 1).create())
-                        try {
-                            page.canvas.drawColor(Color.WHITE)
-                            page.canvas.drawBitmap(bitmap, null, RectF(layout.left, layout.top, layout.left + layout.imageWidth, layout.top + layout.imageHeight), Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))
-                        } finally { document.finishPage(page) }
-                    } finally { bitmap.recycle() }
-                    progress(index + 1, images.size)
-                }
-                currentCoroutineContext().ensureActive()
-                output.outputStream().use { document.writeTo(it) }
-            } finally { document.close() }
-            currentCoroutineContext().ensureActive()
-            // A completed file must also reopen as a PDF with every expected page.
-            ParcelFileDescriptor.open(output, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
-                PdfRenderer(descriptor).use { renderer ->
-                    if (renderer.pageCount != images.size) throw IOException("The PDF could not be verified. Try again.")
+                    // A completed file must also reopen as a PDF with every expected page.
+                    ParcelFileDescriptor.open(output, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
+                        PdfRenderer(descriptor).use { renderer ->
+                            if (renderer.pageCount != images.size) throw IOException("The PDF could not be verified. Try again.")
+                        }
+                    }
+                    currentCoroutineContext().ensureActive()
+                    completed = true
+                    output
+                } finally {
+                    scratch.deleteRecursively()
+                    if (!completed) output.delete()
                 }
             }
-            completed = true
-            output
-        } finally { if (!completed) output.delete() }
-        } } catch (failure: Throwable) {
+        } catch (failure: Throwable) {
             // Includes cancellation during the dispatch back to the caller after the file was written.
             withContext(NonCancellable + Dispatchers.IO) { staged?.delete() }
             throw failure
         }
     }
 
+    private suspend fun embedImage(document: PDDocument, bitmap: Bitmap, jpeg: Boolean): PDImageXObject {
+        val image = PDImageXObject(document).apply {
+            width = bitmap.width
+            height = bitmap.height
+            bitsPerComponent = 8
+            colorSpace = PDDeviceRGB.INSTANCE
+            interpolate = true
+        }
+        if (jpeg) {
+            // Keep photos compressed without buffering the JPEG in a byte array. Decoding has
+            // already applied the size limit and EXIF transform, so these dimensions are final.
+            image.cosObject.setItem(COSName.FILTER, COSName.DCT_DECODE)
+            val jobContext = currentCoroutineContext()
+            jobContext.ensureActive()
+            image.cosObject.createRawOutputStream().use { destination ->
+                val encoded = object : FilterOutputStream(destination) {
+                    override fun write(value: Int) { jobContext.ensureActive(); out.write(value) }
+                    override fun write(bytes: ByteArray, offset: Int, length: Int) {
+                        jobContext.ensureActive()
+                        out.write(bytes, offset, length)
+                    }
+                }
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 90, encoded)) throw IOException("An image could not be encoded. Try another image.")
+            }
+            jobContext.ensureActive()
+            return image
+        }
+        val pixels = IntArray(bitmap.width)
+        val rgb = ByteArray(bitmap.width * 3)
+        image.cosObject.createOutputStream(COSName.FLATE_DECODE).use { encoded ->
+            for (row in 0 until bitmap.height) {
+                currentCoroutineContext().ensureActive()
+                bitmap.getPixels(pixels, 0, bitmap.width, 0, row, bitmap.width, 1)
+                var offset = 0
+                for (pixel in pixels) {
+                    val alpha = Color.alpha(pixel)
+                    if (alpha == 255) {
+                        rgb[offset++] = Color.red(pixel).toByte()
+                        rgb[offset++] = Color.green(pixel).toByte()
+                        rgb[offset++] = Color.blue(pixel).toByte()
+                    } else {
+                        // Match the former white canvas, including partially transparent PNGs.
+                        val white = 255 * (255 - alpha) + 127
+                        rgb[offset++] = ((Color.red(pixel) * alpha + white) / 255).toByte()
+                        rgb[offset++] = ((Color.green(pixel) * alpha + white) / 255).toByte()
+                        rgb[offset++] = ((Color.blue(pixel) * alpha + white) / 255).toByte()
+                    }
+                }
+                encoded.write(rgb)
+            }
+        }
+        return image
+    }
+
+    private data class DecodedImage(val bitmap: Bitmap, val jpeg: Boolean)
+
     companion object {
-        fun decodeImage(resolver: ContentResolver, uri: Uri, maxEdge: Int): Bitmap {
+        fun decodeImage(resolver: ContentResolver, uri: Uri, maxEdge: Int): Bitmap = decodeImageData(resolver, uri, maxEdge).bitmap
+
+        private fun decodeImageData(resolver: ContentResolver, uri: Uri, maxEdge: Int): DecodedImage {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds); Unit }
                 ?: throw IOException("An image is no longer accessible. Select it again.")
@@ -95,8 +183,9 @@ class ImagePdfEngine(private val resolver: ContentResolver, private val stagingD
                     ExifInterface.ORIENTATION_ROTATE_270 -> setRotate(270f)
                 }
             }
-            if (matrix.isIdentity) return bitmap
-            return try { Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true) }
+            val jpeg = bounds.outMimeType == "image/jpeg"
+            if (matrix.isIdentity) return DecodedImage(bitmap, jpeg)
+            return try { DecodedImage(Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true), jpeg) }
             finally { bitmap.recycle() }
         }
     }
