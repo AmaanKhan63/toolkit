@@ -35,7 +35,7 @@ val implementedOfficeTools = setOf("D04", "D07", "P17")
     val back = { if (!state.busy) { currentPassword = ""; newPassword = ""; confirmation = ""; if (state.result != null) model.editResult() else onBack() } }
     BackHandler(onBack = back)
     Scaffold(topBar = { ScreenHeader(if (state.result != null) "Preview result" else if (toPdf) "Excel to PDF" else "Excel protection", back, !state.busy) }, bottomBar = {
-        ActionBar {
+        if (state.inputs.isNotEmpty() || state.busy || state.error != null || state.saved != null) ActionBar {
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             when {
                 state.busy -> { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(state.progress); TextButton(onClick = model::cancel) { Text("Cancel") } }
@@ -69,7 +69,10 @@ val implementedOfficeTools = setOf("D04", "D07", "P17")
                 item { InfoCard("File saved", state.saved!!.name) }
                 item { DocumentActions(state.saved!!) }
             } else {
-                item { InfoCard(state.inputs.firstOrNull()?.name ?: "Choose an Excel workbook", if (toPdf) "Table layout uses cell values and cached formula results. Excel print settings, charts, drawings and merged-cell styling are not reproduced." else "File-open passwords encrypt the workbook. Sheet and workbook editing restrictions control changes without hiding the file’s contents.") }
+                if (state.inputs.isEmpty()) item { FileStartPanel("Start with a workbook", if (toPdf) "Turn your spreadsheet into a readable PDF, with a preview before saving." else "Protect your workbook or remove a password you know.", "Excel · XLSX & XLS", "Choose Excel file", Glyph.FILE, !state.busy) { picker.launch(arrayOf(XLSX_MIME, XLS_MIME, "application/octet-stream")) } }
+                if (state.inputs.isNotEmpty()) {
+                    item { InfoCard(state.inputs.first().name, if (toPdf) "Table layout uses cell values and cached formula results. Excel print settings, charts, drawings and merged-cell styling are not reproduced." else "File-open passwords encrypt the workbook. Sheet and workbook editing restrictions control changes without hiding the file’s contents.") }
+                }
                 if (state.inputs.isNotEmpty()) {
                     item { OutlinedButton(onClick = { picker.launch(arrayOf(XLSX_MIME, XLS_MIME, "application/octet-stream")) }, modifier = Modifier.fillMaxWidth(), enabled = !state.busy) { Text("Replace file") } }
                     if (!toPdf && state.inputs.firstOrNull()?.name?.endsWith(".xls", true) == true) item { EmptyNote("Legacy XLS uses older, weaker password protection. Use XLSX when strong file encryption is required.") }

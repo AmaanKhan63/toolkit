@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <provider
+            android:name="com.amaankhan.toolkit.ui.ReaderFixtureProvider"
+            android:authorities="com.amaankhan.toolkit.test.readerfixtures"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+        <activity
+            android:name="com.amaankhan.toolkit.ui.ReaderFixtureGrantActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+    </application>
+</manifest>

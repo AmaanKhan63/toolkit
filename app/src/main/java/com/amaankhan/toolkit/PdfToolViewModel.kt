@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 data class InputDocument(val uri: String, val name: String)
 data class PdfToolState(
     val inputs: List<InputDocument> = emptyList(), val pageCount: Int? = null,
+    val passwordRequired: Boolean = false,
     val busy: Boolean = false, val progress: String = "", val error: String? = null,
     val result: PdfResult? = null, val saved: ExportedDocument? = null,
 )
@@ -40,8 +41,9 @@ class PdfToolViewModel(application: Application) : AndroidViewModel(application)
                 val all = ((if (append) _state.value.inputs else emptyList()) + inputs).distinctBy { it.uri }
                 require(all.size <= 20) { "Choose up to 20 files." }
                 editResult()
-                val count = if (inspectPdf && all.size == 1) try { engine.pageCount(all[0].uri) } catch (_: InvalidPasswordException) { null } else null
-                _state.update { it.copy(inputs = all, pageCount = count, busy = false) }
+                var passwordRequired = false
+                val count = if (inspectPdf && all.size == 1) try { engine.pageCount(all[0].uri) } catch (_: InvalidPasswordException) { passwordRequired = true; null } else null
+                _state.update { it.copy(inputs = all, pageCount = count, passwordRequired = passwordRequired, busy = false) }
             } catch (e: CancellationException) { _state.update { it.copy(busy = false) }; throw e }
             catch (e: Exception) { _state.update { it.copy(busy = false, error = e.message ?: "The file could not be read.") } }
         }
@@ -86,7 +88,7 @@ class PdfToolViewModel(application: Application) : AndroidViewModel(application)
                 val result = operation { progress -> _state.update { it.copy(progress = progress) } }
                 _state.update { it.copy(result = result, busy = false) }
             } catch (e: CancellationException) { _state.update { it.copy(busy = false, error = "Cancelled. Your original files are unchanged.") }; throw e }
-            catch (_: InvalidPasswordException) { _state.update { it.copy(busy = false, error = "The current password is missing or incorrect. Enter it and try again.") } }
+            catch (_: InvalidPasswordException) { _state.update { it.copy(busy = false, passwordRequired = true, error = "This file needs its current password. Enter it and try again.") } }
             catch (_: OutOfMemoryError) { _state.update { it.copy(busy = false, error = "Not enough memory. Try a smaller document or fewer files.") } }
             catch (e: Exception) { _state.update { it.copy(busy = false, error = e.message ?: "This PDF could not be processed.") } }
         }

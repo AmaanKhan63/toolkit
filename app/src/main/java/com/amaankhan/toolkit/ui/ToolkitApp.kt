@@ -17,11 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.amaankhan.toolkit.R
 import com.amaankhan.toolkit.ToolkitViewModel
 import com.amaankhan.toolkit.data.Preferences
+import com.amaankhan.toolkit.documents.retainDocumentReadPermission
+import com.amaankhan.toolkit.documents.isPdfDocument
 
 data class ToolGroup(val title: String, val description: String, val glyph: Glyph, val ids: List<String>)
 val toolGroups = listOf(
@@ -31,6 +34,7 @@ val toolGroups = listOf(
     ToolGroup("Protect", "PDF & Excel passwords", Glyph.LOCK, listOf("D03", "D04")),
     ToolGroup("Optimize", "Size & metadata", Glyph.COMPRESS, listOf("D05", "P16")),
     ToolGroup("Workflows", "Chain your tools", Glyph.FLOW, listOf("P17")),
+    ToolGroup("Download tools", "Video, links, Telegram & torrents", Glyph.DOWNLOAD, emptyList()),
 )
 
 @Composable fun ToolkitApp(model: ToolkitViewModel, preferences: Preferences) {
@@ -41,11 +45,18 @@ val toolGroups = listOf(
     var pending by rememberSaveable { mutableStateOf<String?>(null) }
     var viewerMime by rememberSaveable { mutableStateOf("application/pdf") }
     var viewerUri by rememberSaveable { mutableStateOf<String?>(null) }
+    var viewerSelection by rememberSaveable { mutableIntStateOf(0) }
     val notice by model.notice.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val exports by model.exports.collectAsStateWithLifecycle()
-    val openPdf = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> viewerMime = "application/pdf"; viewerUri = uri?.toString() }
-    val openDocument = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> viewerMime = "local/document"; viewerUri = uri?.toString() }
+    val resolver = LocalContext.current.contentResolver
+    val openDocument = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) {
+        retainDocumentReadPermission(resolver, uri)
+        viewerMime = if (isPdfDocument(resolver, uri)) "application/pdf" else "local/document"
+        viewerUri = uri.toString()
+        viewerSelection++
+    } }
+    val chooseFile = { openDocument.launch(arrayOf("application/pdf", "text/*", "application/json", "application/xml", "application/epub+zip", "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/octet-stream")) }
     LaunchedEffect(notice) { notice?.let { snackbar.showSnackbar(it); model.dismissNotice() } }
     fun openTool(tool: Tool) {
         if (tool.available || tool.id in implementedPdfTools || tool.id in implementedOfficeTools || tool.id in implementedRichTools) { model.useTool(tool.id); originRoute = route; route = tool.id } else pending = tool.name
@@ -53,7 +64,8 @@ val toolGroups = listOf(
     val back = { route = "" }
     BackHandler(route.isNotEmpty() || tab != "Tools") { if (route.isNotEmpty()) route = "" else tab = "Tools" }
     when {
-        viewerUri != null -> if (viewerMime == "application/pdf") PdfViewerScreen(viewerUri!!, onBack = { viewerUri = null }) else LocalViewerScreen(viewerUri!!, onBack = { viewerUri = null })
+        viewerUri != null -> key(viewerSelection) { if (viewerMime == "application/pdf") PdfViewerScreen(viewerUri!!, onBack = { viewerUri = null }, onChooseFile = chooseFile) else LocalViewerScreen(viewerUri!!, onBack = { viewerUri = null }, onChooseFile = chooseFile) }
+        route == "Download tools" -> DownloadsScreen(initialPage = "sources", onExit = { route = "" }, onOpenFiles = { route = ""; tab = "Files" }, onQueued = { route = ""; tab = "Transfers" })
         route == "D01" -> ImagesToPdfScreen(model) { route = originRoute }
         route == "P05" -> ScanScreen { route = originRoute }
         route in implementedPdfTools -> PdfToolScreen(route) { route = originRoute }
@@ -72,17 +84,19 @@ val toolGroups = listOf(
             }
         }
         else -> Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = { SnackbarHost(snackbar) },
             topBar = {
-                if (tab != "Downloads" || !downloadDetail) Row(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (tab != "Transfers" || !downloadDetail) Surface(color = MaterialTheme.colorScheme.background) { Row(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (tab == "Tools") { Image(painterResource(R.drawable.ic_launcher), null, Modifier.size(36.dp)); Spacer(Modifier.width(12.dp)) }
                     Text(if (tab == "Tools") "Toolkit" else tab, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.weight(1f))
                     IconButton(onClick = { route = "Settings" }) { GlyphIcon(Glyph.SETTINGS, "Settings") }
                 }
+                }
             },
             bottomBar = {
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 0.dp) {
-                    listOf("Tools" to Glyph.GRID, "Downloads" to Glyph.DOWNLOAD, "Files" to Glyph.FOLDER).forEach { (name, icon) ->
+                    listOf("Tools" to Glyph.GRID, "Transfers" to Glyph.DOWNLOAD, "Files" to Glyph.FOLDER).forEach { (name, icon) ->
                         NavigationBarItem(selected = name == tab, onClick = { tab = name }, icon = { GlyphIcon(icon) }, label = { Text(name) })
                     }
                 }
@@ -90,12 +104,18 @@ val toolGroups = listOf(
         ) { padding ->
             when (tab) {
                 "Tools" -> Dashboard(preferences, { route = it }, ::openTool, model::favorite, Modifier.padding(padding))
-                "Downloads" -> DownloadsScreen(Modifier.padding(padding), onDetailChanged = { downloadDetail = it })
+                "Transfers" -> DownloadsScreen(Modifier.padding(padding), onDetailChanged = { downloadDetail = it }, onOpenFiles = { tab = "Files" })
                 "Files" -> LazyColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { PrimaryAction("Open a PDF") { openPdf.launch(arrayOf("application/pdf")) } }
-                    item { OutlinedButton(onClick = { openDocument.launch(arrayOf("text/*", "application/json", "application/xml", "application/epub+zip", "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/octet-stream")) }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text("Open a document or ebook") } }
-                    item { SectionTitle("File history") }
-                    if (exports.isEmpty()) item { EmptyNote("Files you save from Toolkit will appear here. You can also open a PDF from your device.") }
+                    item { Surface(shape = RoundedCornerShape(24.dp)) { Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        GlyphIcon(Glyph.FILE, modifier = Modifier.size(36.dp))
+                        Text("Your document reader", style = MaterialTheme.typography.titleLarge)
+                        Text("Read documents, spreadsheets and ebooks in one place.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        PrimaryAction("Open a file", onClick = chooseFile)
+                    } } }
+                    item { SectionTitle("Formats you can open") }
+                    item { Text("PDF · Word · Excel · PowerPoint\nEPUB · Markdown · Text & CSV · HTML", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    item { SectionTitle("Saved files") }
+                    if (exports.isEmpty()) item { InfoCard("Your saved files will appear here", "Files created by Toolkit and completed transfers are collected here. Open any supported document above to start reading.") }
                     items(exports, key = { it.uri }) { file ->
                         Surface(shape = RoundedCornerShape(16.dp)) {
                             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -104,12 +124,6 @@ val toolGroups = listOf(
                                 DocumentActions(file, onPreview = if (file.mime.startsWith("video/") || file.mime.startsWith("audio/") || file.mime.startsWith("image/") || file.mime in setOf("application/zip", "application/octet-stream")) null else { { viewerMime = file.mime; viewerUri = file.uri } })
                                 TextButton(onClick = { model.removeHistory(file.uri) }) { Text("Remove from history") }
                             }
-                        }
-                    }
-                    if (preferences.recent.isNotEmpty()) {
-                        item { SectionTitle("Recently used tools") }
-                        items(preferences.recent.mapNotNull { id -> documentTools.find { it.id == id } }) { tool ->
-                            ToolRow(tool, tool.id in preferences.favorites, { openTool(tool) }, { model.favorite(tool.id) })
                         }
                     }
                 }
@@ -154,7 +168,11 @@ val toolGroups = listOf(
             item { EmptyNote("Document tools work on your device.") }
         } else {
             val results = documentTools.filter { it.name.contains(query.trim(), true) }
-            if (results.isEmpty()) item { EmptyNote("No tools match “${query.trim()}”. Try a format such as PDF or Excel.") }
+            val matchesDownloads = listOf("download", "youtube", "video", "audio", "telegram", "torrent", "link").any { it.contains(query.trim(), true) || query.contains(it, true) }
+            if (matchesDownloads) item {
+                Surface(onClick = { navigate("Download tools") }, shape = RoundedCornerShape(16.dp)) { Row(Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) { GlyphIcon(Glyph.DOWNLOAD); Text("Download tools", style = MaterialTheme.typography.titleSmall) } }
+            }
+            if (results.isEmpty() && !matchesDownloads) item { EmptyNote("No tools match “${query.trim()}”. Try a format such as PDF or Excel.") }
             items(results, key = { it.id }) { tool -> ToolRow(tool, tool.id in preferences.favorites, { onTool(tool) }, { onSave(tool.id) }) }
         }
     }

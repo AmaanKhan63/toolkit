@@ -82,6 +82,7 @@ class ToolkitNavigationTest {
         compose.onNodeWithText("Manage").performClick()
         compose.onNodeWithText("Arrange images").assertIsDisplayed()
         compose.onNodeWithText("Done").performClick()
+        compose.onNodeWithText("Page layout").performClick()
         compose.onNodeWithText("Page size").performScrollTo().performClick()
         compose.onNodeWithText("Letter").performClick()
         compose.onNodeWithText("Preview PDF").performClick()
@@ -132,17 +133,17 @@ class ToolkitNavigationTest {
         }
     }
     @Test fun allDownloaderSourcesHaveFormsAndTelegramKeepsCredentialsLocal() {
-        compose.onNode(hasText("Downloads") and hasClickAction()).performClick()
+        reveal("Download tools", true).performClick()
         compose.onNodeWithText("Video & audio").performClick()
         compose.onNodeWithText("Inspect formats / playlist").performScrollTo().assertIsNotEnabled()
         compose.onNodeWithText("Add to queue").assertIsNotEnabled()
-        compose.onNodeWithContentDescription("Back to downloads").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("Direct link").performClick()
         compose.onNodeWithText("Filename (optional for a single link)").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Back to downloads").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("Torrent / magnet").performClick()
         compose.onNodeWithText("Read torrent files").assertIsNotEnabled()
-        compose.onNodeWithContentDescription("Back to downloads").performClick()
+        compose.onNodeWithContentDescription("Back").performClick()
         compose.onNodeWithText("Telegram").performClick()
         compose.waitUntil(10000) { compose.onAllNodesWithText("Connect your Telegram account").fetchSemanticsNodes().isNotEmpty() }
         reveal("API ID").assertIsDisplayed()

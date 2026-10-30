@@ -4,6 +4,8 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.amaankhan.toolkit.documents.documentDisplayName
+import com.amaankhan.toolkit.documents.documentReadError
 import com.tom_roush.pdfbox.io.MemoryUsageSetting
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.pdmodel.encryption.InvalidPasswordException
@@ -11,28 +13,40 @@ import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.UUID
 
-data class PdfReaderState(val file: File? = null, val pages: Int = 0, val busy: Boolean = false, val passwordRequired: Boolean = false, val error: String = "", val outline: List<Pair<String, Int>> = emptyList())
+data class PdfReaderState(val file: File? = null, val pages: Int = 0, val busy: Boolean = false, val passwordRequired: Boolean = false, val error: String = "", val outline: List<Pair<String, Int>> = emptyList(), val name: String = "Document")
 class PdfReaderModel(application: Application) : AndroidViewModel(application) {
     private val app = application
     val state = MutableStateFlow(PdfReaderState())
     val matches = MutableStateFlow<List<Pair<Int, String>>>(emptyList())
     val searching = MutableStateFlow(false)
     private var load: Job? = null; private var search: Job? = null
-    private val owned = java.util.concurrent.ConcurrentLinkedQueue<File>()
+    private var searchGeneration = 0
     private val directory = File(app.cacheDir, "pdf-tools").apply { mkdirs() }
     fun open(source: String, password: String = "") {
-        load?.cancel(); search?.cancel(); matches.value = emptyList()
+        val previousLoad = load
+        val previousSearch = search
+        val previousFile = state.value.file
+        previousLoad?.cancel(); previousSearch?.cancel(); matches.value = emptyList()
+        previousFile?.delete()
+        searchGeneration++; searching.value = false
         load = viewModelScope.launch {
+            var output: File? = null
+            var name = "Document"
             state.value = PdfReaderState(busy = true)
             try {
+                previousLoad?.join(); previousSearch?.join()
                 val next = withContext(Dispatchers.IO) {
-                    val output = File(directory, "viewer-${UUID.randomUUID()}.pdf"); owned += output
+                    if (!directory.isDirectory && !directory.mkdirs()) throw java.io.IOException("Reader cache is unavailable.")
                     val uri = Uri.parse(source)
-                    val input = if (uri.scheme == "file") File(requireNotNull(uri.path)).inputStream() else app.contentResolver.openInputStream(uri) ?: error("The file is no longer accessible.")
+                    name = documentDisplayName(app.contentResolver, uri)
+                    val target = File(directory, "viewer-${UUID.randomUUID()}.pdf")
+                    output = target
+                    val input = if (uri.scheme == "file") File(requireNotNull(uri.path)).inputStream() else app.contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
                     input.use { stream -> PDDocument.load(stream, password, MemoryUsageSetting.setupMixed(16L * 1024 * 1024).setTempDir(directory)).use { doc ->
-                        require(doc.numberOfPages in 1..2000) { "Open a PDF with 1–2,000 pages." }
+                        if (doc.numberOfPages !in 1..2000) throw PdfPageLimitException()
                         val outline = mutableListOf<Pair<String, Int>>()
                         fun collect(first: com.tom_roush.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem?, depth: Int = 0) {
                             if (depth > 16) return
@@ -45,19 +59,23 @@ class PdfReaderModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
                         collect(doc.documentCatalog.documentOutline?.firstChild)
-                        currentCoroutineContext().ensureActive(); doc.isAllSecurityToBeRemoved = true; doc.save(output)
-                        PdfReaderState(output, doc.numberOfPages, outline = outline)
+                        currentCoroutineContext().ensureActive(); doc.isAllSecurityToBeRemoved = true; doc.save(target)
+                        PdfReaderState(target, doc.numberOfPages, outline = outline, name = name)
                     } }
                 }
                 state.value = next
             } catch (e: CancellationException) { throw e }
-            catch (_: InvalidPasswordException) { state.value = PdfReaderState(passwordRequired = true, error = if (password.isBlank()) "This PDF requires a password." else "That password did not unlock the PDF.") }
-            catch (_: OutOfMemoryError) { state.value = PdfReaderState(error = "Not enough memory. Try a smaller document.") }
-            catch (e: Exception) { state.value = PdfReaderState(error = e.message ?: "Unable to open this PDF.") }
+            catch (_: InvalidPasswordException) { currentCoroutineContext().ensureActive(); state.value = PdfReaderState(name = name, passwordRequired = true, error = if (password.isBlank()) "This PDF requires a password." else "That password did not unlock the PDF.") }
+            catch (_: PdfPageLimitException) { currentCoroutineContext().ensureActive(); state.value = PdfReaderState(name = name, error = "Open a PDF with 1–2,000 pages.") }
+            catch (e: OutOfMemoryError) { currentCoroutineContext().ensureActive(); state.value = PdfReaderState(name = name, error = documentReadError(e, pdf = true)) }
+            catch (e: Exception) { currentCoroutineContext().ensureActive(); state.value = PdfReaderState(name = name, error = documentReadError(e, pdf = true)) }
+            finally { output?.takeIf { it != state.value.file }?.delete() }
         }
     }
     fun find(query: String) {
         search?.cancel(); matches.value = emptyList()
+        val generation = ++searchGeneration
+        searching.value = false
         val file = state.value.file ?: return
         if (query.isBlank()) return
         search = viewModelScope.launch {
@@ -70,9 +88,26 @@ class PdfReaderModel(application: Application) : AndroidViewModel(application) {
                     if (position >= 0 && results.size < 500) results += index to text.substring((position - 35).coerceAtLeast(0), (position + query.length + 100).coerceAtMost(text.length)).replace('\n', ' ')
                 }; results
             } } } catch (e: CancellationException) { throw e }
-            catch (e: Exception) { state.value = state.value.copy(error = "Text search could not read this PDF.") }
-            finally { searching.value = false }
+            catch (e: Exception) { currentCoroutineContext().ensureActive(); state.value = state.value.copy(error = "Text search could not read this PDF.") }
+            finally { if (generation == searchGeneration) searching.value = false }
         }
     }
-    override fun onCleared() { super.onCleared(); owned.forEach(File::delete) }
+    fun renderFailed(file: File, message: String) {
+        val current = state.value
+        // Ignore a late callback from a preview that has already been replaced.
+        if (current.file != file) return
+        search?.cancel(); searchGeneration++
+        matches.value = emptyList(); searching.value = false
+        file.delete()
+        state.value = PdfReaderState(name = current.name, error = message)
+    }
+    fun close() {
+        load?.cancel(); search?.cancel(); searchGeneration++
+        state.value.file?.delete()
+        state.value = PdfReaderState()
+        matches.value = emptyList(); searching.value = false
+    }
+    override fun onCleared() { close(); super.onCleared() }
 }
+
+private class PdfPageLimitException : Exception()

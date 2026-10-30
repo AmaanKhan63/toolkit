@@ -22,7 +22,7 @@ import com.amaankhan.toolkit.downloads.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@Composable fun TelegramScreen(model: DownloadsModel, onBack: () -> Unit) {
+@Composable fun TelegramScreen(model: DownloadsModel, onBack: () -> Unit, onQueued: () -> Unit = onBack) {
     val context = LocalContext.current
     val telegram = model.telegram
     val status by telegram.status.collectAsStateWithLifecycle()
@@ -42,7 +42,7 @@ import kotlinx.coroutines.withContext
     var folder by rememberSaveable { mutableStateOf(model.store.defaultFolder) }
     var showSignout by remember { mutableStateOf(false) }
     val notification = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-    val folderPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri -> if (uri != null) model.action {
+    val folderPicker = rememberLauncherForActivityResult(DestinationFolderContract()) { uri -> if (uri != null) model.action {
         context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         folder = uri.toString(); model.store.defaultFolder = folder
     } }
@@ -57,7 +57,7 @@ import kotlinx.coroutines.withContext
     LaunchedEffect(status.step) { if (status.step == "ready") perform { chats = telegram.chats("") } }
     LaunchedEffect(chat?.id, type) { if (chat != null) loadFiles() }
     Column(Modifier.fillMaxSize()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().statusBarsPadding().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { if (chat != null) { chat = null; query = ""; files = emptyList(); searched = false } else onBack() }) { GlyphIcon(Glyph.BACK, "Back") }
             Text(chat?.title ?: "Telegram", modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
             if (status.step !in setOf("credentials", "connecting")) TextButton(onClick = { showSignout = true }) { Text("Sign out") }
@@ -101,11 +101,12 @@ import kotlinx.coroutines.withContext
         }
         if (status.step == "ready" && chat != null) ActionBar {
             TextButton(onClick = { folderPicker.launch(folder.takeIf(String::isNotBlank)?.let(Uri::parse)) }) { Text(if (folder.isBlank()) "Choose destination folder" else "Destination selected · Change") }
+            if (folder.isBlank()) FolderGuidance()
             PrimaryAction("Queue ${selected.size} files", !working && selected.isNotEmpty() && folder.isNotBlank()) { perform {
                 telegram.enqueue(files.filter { it.message in selected }, folder)
                 withContext(Dispatchers.Main) {
                     if (Build.VERSION.SDK_INT >= 33) notification.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    DownloadService.start(context); onBack()
+                    DownloadService.start(context); onQueued()
                 }
             } }
         }

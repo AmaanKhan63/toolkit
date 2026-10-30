@@ -9,6 +9,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,12 +27,12 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable fun PdfViewerScreen(uri: String, onBack: () -> Unit) {
-    val model: PdfReaderModel = viewModel(key = "reader-$uri")
+@Composable fun PdfViewerScreen(uri: String, onBack: () -> Unit, onChooseFile: () -> Unit = onBack) {
+    val model: PdfReaderModel = viewModel(key = "pdf-reader")
     val state by model.state.collectAsStateWithLifecycle()
     val matches by model.matches.collectAsStateWithLifecycle()
     val searching by model.searching.collectAsStateWithLifecycle()
-    var password by remember { mutableStateOf("") }
+    var password by remember(uri) { mutableStateOf("") }
     var query by rememberSaveable { mutableStateOf("") }
     var page by rememberSaveable(uri) { mutableIntStateOf(0) }
     var jump by remember { mutableStateOf<Pair<Int, Int>?>(null) }
@@ -41,15 +43,19 @@ import java.io.File
     var bookmarks by remember(uri) { mutableStateOf(preferences.getStringSet(bookmarkKey, emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet()) }
     fun navigate(index: Int) { jump = index to ((jump?.second ?: 0) + 1); sheet = "" }
     LaunchedEffect(uri) { model.open(uri) }
+    DisposableEffect(model, uri) { onDispose { model.close() } }
     BackHandler(onBack = onBack)
-    Scaffold(topBar = { ScreenHeader("PDF viewer", onBack) }) { padding -> Column(Modifier.padding(padding).fillMaxSize()) {
+    Scaffold(topBar = { ScreenHeader(state.name, onBack) }) { padding -> Column(Modifier.padding(padding).fillMaxSize()) {
         when {
             state.busy -> { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Opening document…", Modifier.padding(20.dp)) }
-            state.passwordRequired -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            state.passwordRequired -> Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(state.error); PasswordField("PDF password", password, true) { password = it }
                 PrimaryAction("Open PDF", password.isNotEmpty()) { model.open(uri, password); password = "" }
+                OutlinedButton(onClick = onChooseFile, modifier = Modifier.fillMaxWidth()) { Text("Choose another file") }
             }
-            state.file == null -> Text(state.error, Modifier.padding(24.dp), color = MaterialTheme.colorScheme.error)
+            state.file == null -> Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
+                DocumentAccessRecovery(state.error, { model.open(uri) }, onChooseFile)
+            }
             else -> {
                 FlowRow(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     TextButton(onClick = { sheet = "Pages" }) { Text("Pages") }
@@ -61,7 +67,10 @@ import java.io.File
                     }) { GlyphIcon(if (page in bookmarks) Glyph.CHECK else Glyph.STAR, if (page in bookmarks) "Remove page bookmark" else "Bookmark page") }
                 }
                 if (state.error.isNotBlank()) Text(state.error, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = 16.dp))
-                PdfPreview(Uri.fromFile(state.file).toString(), Modifier.weight(1f).fillMaxWidth(), jump) { page = it }
+                val prepared = requireNotNull(state.file)
+                PdfPreview(Uri.fromFile(prepared).toString(), Modifier.weight(1f).fillMaxWidth(), jump,
+                    onReadError = { message -> model.renderFailed(prepared, message); sheet = "" }
+                ) { page = it }
             }
         }
     } }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.amaankhan.toolkit.documents.documentReadError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -20,14 +21,16 @@ import java.io.File
     BackHandler(onBack = onBack)
     Scaffold(topBar = { ScreenHeader("Text viewer", onBack) }) { padding -> TextPreview(uri, Modifier.padding(padding).fillMaxSize()) }
 }
-@Composable fun TextPreview(uri: String, modifier: Modifier = Modifier) {
+@Composable fun TextPreview(uri: String, modifier: Modifier = Modifier, onReadError: ((String) -> Unit)? = null) {
     val context = LocalContext.current
+    val reportError by rememberUpdatedState(onReadError)
     var chunk by androidx.compose.runtime.saveable.rememberSaveable(uri) { mutableIntStateOf(0) }
     val result by produceState<Pair<String, Boolean>?>(null, uri, chunk) {
         value = null
         value = try { com.amaankhan.toolkit.documents.LocalDocumentReader(context).textChunk(uri, chunk) }
         catch (e: kotlinx.coroutines.CancellationException) { throw e }
-        catch (_: Exception) { "This file could not be opened." to false }
+        catch (e: OutOfMemoryError) { documentReadError(e).let { reportError?.invoke(it); it to false } }
+        catch (e: Exception) { documentReadError(e).let { reportError?.invoke(it); it to false } }
     }
     Column(modifier.previewPageSwipe(result != null) { delta ->
         if (delta < 0 && chunk > 0 || delta > 0 && result?.second == true) chunk += delta

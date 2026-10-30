@@ -3,6 +3,8 @@ package com.amaankhan.toolkit.ui
 import android.webkit.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,14 +20,15 @@ import kotlinx.coroutines.*
 import java.io.ByteArrayInputStream
 
 @OptIn(ExperimentalLayoutApi::class)
-@Composable fun LocalViewerScreen(uri: String, onBack: () -> Unit) {
+@Composable fun LocalViewerScreen(uri: String, onBack: () -> Unit, onChooseFile: () -> Unit = onBack) {
     val context = LocalContext.current
-    val reader = remember { LocalDocumentReader(context) }
+    val reader = remember(context) { LocalDocumentReader(context) }
     var document by remember(uri) { mutableStateOf<LocalDocument?>(null) }
     var error by remember(uri) { mutableStateOf<String?>(null) }
     var name by remember(uri) { mutableStateOf("Document") }
-    var password by remember { mutableStateOf("") }
-    var attempt by remember { mutableIntStateOf(0) }
+    var password by remember(uri) { mutableStateOf("") }
+    var passwordRequired by remember(uri) { mutableStateOf(false) }
+    var attempt by remember(uri) { mutableIntStateOf(0) }
     var section by rememberSaveable(uri) { mutableIntStateOf(0) }
     var source by rememberSaveable(uri) { mutableStateOf(false) }
     var query by rememberSaveable(uri) { mutableStateOf("") }
@@ -35,28 +38,31 @@ import java.io.ByteArrayInputStream
     var fullScreen by rememberSaveable(uri) { mutableStateOf(false) }
     LaunchedEffect(uri, attempt) {
         error = null
+        document = null
+        textOnly = false
+        passwordRequired = false
         try {
             name = withContext(Dispatchers.IO) { reader.name(uri) }
             textOnly = name.substringAfterLast('.').lowercase() in listOf("txt", "csv", "tsv", "json", "xml", "log")
             if (!textOnly) document = reader.read(uri, password)
             password = ""
         } catch (e: CancellationException) { throw e }
-        catch (_: OutOfMemoryError) { error = "Not enough memory for this document. Choose a smaller file." }
-        catch (e: Exception) { error = e.message ?: "This document could not be opened." }
+        catch (e: OutOfMemoryError) { error = documentReadError(e) }
+        catch (_: org.apache.poi.EncryptedDocumentException) { passwordRequired = true; error = "This spreadsheet needs a valid password. Enter it and try again." }
+        catch (e: Exception) { error = documentReadError(e) }
     }
     BackHandler { if (fullScreen) fullScreen = false else onBack() }
     Scaffold(topBar = { if (!fullScreen) ScreenHeader(name, onBack) else Row(Modifier.fillMaxWidth().statusBarsPadding()) { IconButton(onClick = { fullScreen = false }) { GlyphIcon(Glyph.CLOSE, "Exit fullscreen") } } }) { padding -> Column(Modifier.padding(padding).fillMaxSize()) {
         when {
-            textOnly -> StructuredTextViewer(uri, name)
-            error != null -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(error!!, color = MaterialTheme.colorScheme.error)
-                if (name.endsWith("xlsx", true) || name.endsWith("xls", true)) PasswordField("File password", password, true) { password = it }
-                PrimaryAction("Try again") { attempt++ }
+            error != null -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+                if (passwordRequired) Box(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) { PasswordField("File password", password, true) { password = it } }
+                DocumentAccessRecovery(error!!, { attempt++ }, onChooseFile)
             }
+            textOnly -> key(uri, attempt) { StructuredTextViewer(uri, name) { error = it } }
             document == null -> Box(Modifier.padding(24.dp)) { CircularProgressIndicator() }
             else -> {
                 val doc = document!!
-                if (doc.sections.isEmpty()) { EmptyNote("No readable sections found."); return@Column }
+                if (doc.sections.isEmpty()) { DocumentAccessRecovery("No readable sections were found in this document.", { attempt++ }, onChooseFile); return@Column }
                 val current = section.coerceIn(doc.sections.indices)
                 if (!fullScreen) {
                 if (doc.sections.size > 1) Row(Modifier.padding(horizontal = 12.dp)) {
@@ -90,6 +96,14 @@ import java.io.ByteArrayInputStream
     } }
 }
 
+@Composable internal fun DocumentAccessRecovery(message: String, onRetry: () -> Unit, onChooseFile: () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(message, color = MaterialTheme.colorScheme.error)
+        PrimaryAction("Retry", onClick = onRetry)
+        OutlinedButton(onClick = onChooseFile, modifier = Modifier.fillMaxWidth()) { Text("Choose another file") }
+    }
+}
+
 @Composable fun SafeDocumentWebView(html: String, zoom: Int = 100, modifier: Modifier = Modifier, onNavigate: ((Int) -> Unit)? = null, onView: (WebView) -> Unit = {}) {
     var previous by remember { mutableStateOf("") }
     AndroidView(factory = { context -> SectionWebView(context).apply {
@@ -105,13 +119,14 @@ import java.io.ByteArrayInputStream
     } }, update = { view -> view.onNavigate = onNavigate; view.settings.textZoom = zoom; if (previous != html) { previous = html; view.loadDataWithBaseURL("https://document.toolkit.invalid/", html, "text/html", "UTF-8", null) } }, onRelease = { it.stopLoading(); it.destroy() }, modifier = modifier.clipToBounds())
 }
 
-@Composable private fun StructuredTextViewer(uri: String, name: String) {
+@Composable private fun StructuredTextViewer(uri: String, name: String, onReadError: (String) -> Unit) {
     var mode by rememberSaveable(uri) { mutableStateOf("Source") }
     val extension = name.substringAfterLast('.').lowercase()
     val context = LocalContext.current
     val reader = remember(context) { LocalDocumentReader(context) }
     var formatted by remember(uri, mode) { mutableStateOf<String?>(null) }
-    LaunchedEffect(mode) {
+    val reportError by rememberUpdatedState(onReadError)
+    LaunchedEffect(uri, mode) {
         if (mode != "Source") {
             try {
             val (text, more) = reader.textChunk(uri, 0, 512 * 1024)
@@ -123,12 +138,13 @@ import java.io.ByteArrayInputStream
                 }
             }.getOrElse { "<p>Unable to format this file. Open Source to inspect it.</p>" }
             } catch (e: CancellationException) { throw e }
-            catch (_: Exception) { formatted = "<p>This file is no longer accessible. Select it again from Files.</p>" }
+            catch (e: OutOfMemoryError) { reportError(documentReadError(e)) }
+            catch (e: Exception) { reportError(documentReadError(e)) }
         }
     }
     Column(Modifier.fillMaxSize()) {
         if (extension in listOf("csv", "tsv", "json")) Row(Modifier.padding(horizontal = 16.dp)) { TextButton(onClick = { mode = "Source" }) { Text("Source") }; TextButton(onClick = { mode = "Structured" }) { Text(if (extension == "json") "Formatted" else "Table") } }
-        if (mode == "Source") TextPreview(uri, Modifier.weight(1f).fillMaxWidth())
+        if (mode == "Source") TextPreview(uri, Modifier.weight(1f).fillMaxWidth(), onReadError = reportError)
         else if (formatted == null) CircularProgressIndicator(Modifier.padding(24.dp)) else SafeDocumentWebView(documentHtml(formatted!!), modifier = Modifier.weight(1f).fillMaxWidth())
     }
 }

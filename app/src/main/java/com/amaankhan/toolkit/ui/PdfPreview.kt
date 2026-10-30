@@ -22,8 +22,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.amaankhan.toolkit.documents.documentReadError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.roundToInt
@@ -32,7 +35,7 @@ private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, 
 
 /** Renders the actual generated file. Only one bounded page bitmap is retained per viewer. */
 @OptIn(ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
-@Composable fun PdfPreview(uri: String, modifier: Modifier = Modifier, jump: Pair<Int, Int>? = null, onPageChanged: (Int) -> Unit = {}) {
+@Composable fun PdfPreview(uri: String, modifier: Modifier = Modifier, jump: Pair<Int, Int>? = null, onReadError: ((String) -> Unit)? = null, onPageChanged: (Int) -> Unit = {}) {
     var page by rememberSaveable(uri) { mutableIntStateOf(0) }
     LaunchedEffect(page) { onPageChanged(page) }
     var zoom by rememberSaveable(uri) { mutableFloatStateOf(1f) }
@@ -40,9 +43,10 @@ private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, 
     var panY by remember { mutableFloatStateOf(0f) }
     var viewport by remember { mutableStateOf(IntSize.Zero) }
     val resolver = LocalContext.current.contentResolver
+    val reportError by rememberUpdatedState(onReadError)
     val rendered by produceState(RenderedPage(), uri, page) {
         value = RenderedPage()
-        value = try {
+        val next = try {
             withContext(Dispatchers.IO) {
                 val source = Uri.parse(uri)
                 val descriptor = if (source.scheme == "file") ParcelFileDescriptor.open(File(requireNotNull(source.path)), ParcelFileDescriptor.MODE_READ_ONLY)
@@ -61,7 +65,11 @@ private data class RenderedPage(val bitmap: Bitmap? = null, val count: Int = 0, 
             }
         } catch (e: CancellationException) { throw e }
         catch (_: SecurityException) { RenderedPage(error = "This PDF is password protected or access has expired. Unlock it first, or select it again.") }
-        catch (_: Exception) { RenderedPage(error = "This PDF could not be opened. It may be damaged, encrypted, or no longer accessible.") }
+        catch (e: OutOfMemoryError) { RenderedPage(error = documentReadError(e, pdf = true)) }
+        catch (e: Exception) { RenderedPage(error = documentReadError(e, pdf = true)) }
+        currentCoroutineContext().ensureActive()
+        value = next
+        next.error?.let { reportError?.invoke(it) }
     }
     fun setZoom(next: Float) { zoom = next.coerceIn(1f, 3f); if (zoom == 1f) { panX = 0f; panY = 0f } }
     LaunchedEffect(jump) { jump?.let { page = it.first.coerceAtLeast(0); setZoom(1f) } }

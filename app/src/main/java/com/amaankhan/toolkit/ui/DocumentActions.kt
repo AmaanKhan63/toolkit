@@ -68,4 +68,10 @@ private suspend fun launchDocument(context: Context, file: ExportedDocument, sha
         Toast.makeText(context, "No app is installed for this file type. You can still share the file.", Toast.LENGTH_LONG).show()
     } catch (_: Exception) { Toast.makeText(context, "This file is unavailable or its access has expired. Open it from your file manager.", Toast.LENGTH_LONG).show() }
 }
-fun formatBytes(bytes: Long): String = if (bytes < 1024 * 1024) "${(bytes / 1024).coerceAtLeast(1)} KB" else String.format(Locale.ROOT, "%.1f MB", bytes / (1024.0 * 1024))
+fun formatBytes(bytes: Long): String = when {
+    bytes <= 0 -> "0 B"
+    bytes < 1024 -> "$bytes B"
+    bytes < 1024 * 1024 -> String.format(Locale.ROOT, "%.1f KB", bytes / 1024.0)
+    bytes < 1024L * 1024 * 1024 -> String.format(Locale.ROOT, "%.1f MB", bytes / (1024.0 * 1024))
+    else -> String.format(Locale.ROOT, "%.2f GB", bytes / (1024.0 * 1024 * 1024))
+}

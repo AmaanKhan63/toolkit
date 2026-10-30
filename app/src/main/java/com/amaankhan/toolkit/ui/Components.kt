@@ -9,11 +9,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable fun ScreenHeader(title: String, onBack: () -> Unit, enabled: Boolean = true) {
+    Surface(color = MaterialTheme.colorScheme.background) {
     Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onBack, enabled = enabled) { GlyphIcon(Glyph.BACK, "Back") }
-        Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f).padding(end = 16.dp))
+        Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 16.dp))
+    }
     }
 }
 
@@ -34,9 +37,11 @@ import androidx.compose.ui.unit.dp
 @Composable fun ChoiceField(label: String, value: String, choices: List<String>, enabled: Boolean = true, onSelect: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Surface(onClick = { open = true }, enabled = enabled, shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-            Text(value, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        Row(Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+            }
             GlyphIcon(Glyph.DOWN)
         }
     }
@@ -52,5 +57,58 @@ import androidx.compose.ui.unit.dp
                 }
             }
         }
+    }
+}
+
+/** Shared first-use file flow. The selection action sits beside the explanation. */
+@Composable fun FileStartPanel(
+    title: String,
+    description: String,
+    formats: String,
+    action: String,
+    glyph: Glyph = Glyph.FILE,
+    enabled: Boolean = true,
+    onChoose: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(28.dp)) {
+        Surface(shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surface) {
+            Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+                GlyphIcon(glyph, modifier = Modifier.size(40.dp), tint = MaterialTheme.colorScheme.primary)
+                Text(title, style = MaterialTheme.typography.titleLarge)
+                Text(description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                PrimaryAction(action, enabled, onChoose)
+                Text(formats, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+            Text("A few simple steps", style = MaterialTheme.typography.titleMedium)
+            listOf("Choose your files" to "Browse your device and select what you need.",
+                "Make it yours" to "Adjust the options and review the result.",
+                "Save a copy" to "Choose where the finished file belongs.").forEachIndexed { index, step ->
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.Top) {
+                    Text("0${index + 1}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(step.first, style = MaterialTheme.typography.titleSmall)
+                        Text(step.second, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+        Text("Processed on your device. Your original files stay unchanged.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable fun ExpandableOptions(title: String, summary: String, expanded: Boolean, onToggle: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Surface(onClick = onToggle, shape = RoundedCornerShape(16.dp)) {
+            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(title, style = MaterialTheme.typography.titleSmall)
+                    Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                GlyphIcon(if (expanded) Glyph.UP else Glyph.DOWN, if (expanded) "Collapse $title" else "Expand $title")
+            }
+        }
+        if (expanded) content()
     }
 }

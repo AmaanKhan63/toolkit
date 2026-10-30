@@ -71,15 +71,17 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
     var password by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmation by remember { mutableStateOf("") }
+    var permissionsExpanded by rememberSaveable { mutableStateOf(false) }
+    var enterPassword by remember(state.inputs) { mutableStateOf(false) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris -> model.select(uris, true) }
     val singlePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { model.select(listOf(it), false) } }
     fun chooseInput() { if (toolId == "D02") picker.launch(arrayOf("application/pdf")) else singlePicker.launch(arrayOf("application/pdf")) }
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(state.result?.mime ?: "application/pdf"), model::save)
-    val saveFolder = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree(), model::saveImagesToFolder)
+    val saveFolder = rememberLauncherForActivityResult(DestinationFolderContract(), model::saveImagesToFolder)
     val back = { if (!state.busy) { password = ""; newPassword = ""; confirmation = ""; if (state.result != null) model.editResult() else onBack() } }
     BackHandler(onBack = back)
     Scaffold(topBar = { ScreenHeader(if (state.result != null) "Preview result" else title, back, !state.busy) }, bottomBar = {
-        ActionBar {
+        if (state.inputs.isNotEmpty() || state.busy || state.error != null || state.saved != null) ActionBar {
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
             when {
                 state.busy -> { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(state.progress, style = MaterialTheme.typography.bodySmall); TextButton(onClick = model::cancel) { Text("Cancel") } }
@@ -98,7 +100,7 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                     when {
                         toolId == "D03" && action == "Protect" && newPassword.isBlank() -> model.error("Enter a new password.")
                         toolId == "D03" && action == "Protect" && newPassword != confirmation -> model.error("The new passwords do not match.")
-                        toolId == "D03" && action == "Unlock" && password.isEmpty() -> model.error("Enter the current password.")
+                        toolId == "D03" && action == "Unlock" && state.passwordRequired && password.isEmpty() -> model.error("Enter the current password.")
                         !allPages && pages.isBlank() -> model.error("Choose the pages to include.")
                         toolId == "P03" && (crop.toIntOrNull() ?: -1) !in 0..160 -> model.error("Enter a crop between 0 and 160 px.")
                         toolId in setOf("D05", "P04", "P09") || (toolId == "D12" && imageMode == "Embedded images") || (toolId == "P01" && splitMode != "One PDF") -> {
@@ -148,7 +150,7 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                     item { InfoCard("File saved", state.saved!!.name) }
                     item { DocumentActions(state.saved!!) }
                 } else {
-                    if (state.inputs.isEmpty()) item { InfoCard(title, "Choose your input, adjust the options and review the result before saving a new file.") }
+                    if (state.inputs.isEmpty()) item { FileStartPanel("Start with ${if (toolId == "D02") "your PDFs" else "a PDF"}", "${title}. Choose a document to get started, then review your changes before saving.", "PDF documents", if (toolId == "D02") "Choose PDFs" else "Choose PDF", if (toolId == "D03") Glyph.LOCK else Glyph.FILE, !state.busy, ::chooseInput) }
                     itemsIndexed(state.inputs, key = { _, input -> input.uri }) { index, input -> Surface(shape = RoundedCornerShape(16.dp)) {
                         Column(Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) { GlyphIcon(Glyph.FILE); Text(input.name, Modifier.weight(1f).padding(start = 12.dp), style = MaterialTheme.typography.titleSmall); IconButton(onClick = { model.remove(index) }, enabled = !state.busy) { GlyphIcon(Glyph.CLOSE, "Remove ${input.name}") } }
@@ -162,14 +164,22 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                     if (state.inputs.isNotEmpty()) {
                         item { OutlinedButton(onClick = { chooseInput() }, enabled = !state.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(if (toolId == "D02") "Add PDFs" else "Replace file") } }
                         if (toolId == "D03") {
-                            item { ChoiceField("Action", action, listOf("Protect", "Unlock"), !state.busy) { action = it; password = ""; newPassword = ""; confirmation = "" } }
+                            item { ChoiceField("What would you like to do?", if (action == "Protect") "Protect with a password" else "Remove password", listOf("Protect with a password", "Remove password"), !state.busy) { action = if (it == "Remove password") "Unlock" else "Protect"; password = ""; newPassword = ""; confirmation = "" } }
+                            if (state.passwordRequired) item {
+                                InfoCard("This PDF is already protected", if (action == "Protect") "Enter its current password to open it, then set the new password below." else "Enter the password that opens this PDF. We’ll save an unlocked copy.")
+                                Spacer(Modifier.height(16.dp))
+                                PasswordField("Current PDF password", password, !state.busy) { password = it }
+                            }
                             if (action == "Protect") {
                                 item { PasswordField("New password", newPassword, !state.busy) { newPassword = it } }
                                 item { PasswordField("Confirm password", confirmation, !state.busy) { confirmation = it } }
-                                item { Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowPrint, { allowPrint = it }, enabled = !state.busy); Text("Allow printing") } }
-                                item { Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowModify, { allowModify = it }, enabled = !state.busy); Text("Allow editing") } }
-                                item { Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowExtract, { allowExtract = it }, enabled = !state.busy); Text("Allow copying text") }; EmptyNote("Restrictions depend on the PDF reader honoring them. The file-open password provides encryption.") }
-                            }
+                                item { ExpandableOptions("Reader permissions", "Printing, editing and copying", permissionsExpanded, { permissionsExpanded = !permissionsExpanded }) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowPrint, { allowPrint = it }, enabled = !state.busy); Text("Allow printing") }
+                                    Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowModify, { allowModify = it }, enabled = !state.busy); Text("Allow editing") }
+                                    Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(allowExtract, { allowExtract = it }, enabled = !state.busy); Text("Allow copying text") }
+                                    EmptyNote("These permissions depend on the PDF reader. Your password encrypts the file.")
+                                } }
+                            } else if (!state.passwordRequired) item { EmptyNote("This PDF opens without a password. You can still save a copy with any reader restrictions removed.") }
                         }
                         if (toolId in setOf("P01", "P02", "P03", "P14", "D12", "D05", "P04", "P09")) {
                             item { ChoiceField("Pages", if (allPages) "All pages" else "Selected pages", listOf("All pages", "Selected pages"), !state.busy) { allPages = it == "All pages" } }
@@ -226,7 +236,10 @@ val implementedPdfTools = setOf("D02", "D03", "D12", "P01", "P02", "P03", "P14",
                         }
                         if (toolId == "P16") item { OutlinedButton(onClick = { model.inspectMetadata(password) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text("Inspect metadata") }; if (metadata.isNotBlank()) Text(metadata, style = MaterialTheme.typography.bodySmall) }
                         if (toolId == "P16") item { InfoCard("Remove PDF metadata", "Clears the document information fields and XMP metadata. Content, annotations and embedded attachments are unchanged.") }
-                        item { PasswordField(if (toolId == "D03" && action == "Unlock") "Current password" else "Current password (if protected)", password, !state.busy) { password = it } }
+                        if (toolId != "D03") {
+                            if (state.passwordRequired || enterPassword) item { PasswordField("Current PDF password", password, !state.busy) { password = it } }
+                            else item { TextButton(onClick = { enterPassword = true }) { Text("File needs a password?") } }
+                        }
                         item { EmptyNote("Processing stays on your device. Originals stay unchanged.") }
                     }
                 }
