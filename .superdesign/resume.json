@@ -79,7 +79,7 @@
         "41479730-3489-47d2-b335-cf4b829f3717": {
           "title": "Toolkit Dashboard Refined",
           "visualDirection": "Corrected whole-app interactions; three selectable comparison palettes",
-          "currentVersion": 9,
+          "currentVersion": 10,
           "userApprovedVersion": 5,
           "approvalDate": "2026-10-05",
           "approvalScope": "Theme palettes approved with Platinum default; remaining interaction review separate. Historical full baseline approval remains version 5.",
@@ -113,8 +113,8 @@
           "themeApprovalDate": "2026-10-07"
         }
       },
-      "updatedAt": "2026-10-08T10:39:10.233108+00:00",
-      "reviewStatus": "October 8 validation pass completed: 12 JVM and 54 native cases passing across engine/UI runs; one optional live-site skip. Telegram account and physical-device checks explicitly deferred. See docs/validation-2026-10-08.md.",
+      "updatedAt": "2026-10-30T14:33:18Z",
+      "reviewStatus": "October 30: 30 JVM tests pass; 80 executed native baseline regressions pass. Ten focused native diagnostics/UI checks pass after report capture/export was added. Four original compact-screen flows pass at 320dp / font scale 1.3; the updated diagnostic transfer flow also passes at that size. Native screenshots are available for pending user approval. YouTube and physical-device limits are recorded in docs/toolkit-repairs-2026-10-30.md.",
       "referenceIds": [
         "f2da579b-7e43-41f8-a93f-f79aa0cb5a1b",
         "toolkit-folded-t"
@@ -152,7 +152,13 @@
         "scope": "Proceed with native Android implementation using the reviewed design; no further design approval gate"
       },
       "nativeImplementationDocument": "docs/native-toolkit-2026-10-07.md",
-      "interactionFeedback": "0.4.1: transparent icon interiors, outside-tap keyboard dismissal, preview swipes; 8 new UI regressions pass, 9 existing UI regressions passed in preceding run. No new canvas generation."
+      "uiReview": {
+        "version": "0.4.2",
+        "status": "awaiting_user_approval",
+        "gallery": "docs/validation/2026-10-30-ui/index.html",
+        "scope": "User will review the native screenshots; branch publication is authorized separately and does not approve the UI."
+      },
+      "interactionFeedback": "0.4.2: user requested ten usability/reliability repairs and selected Tools + Transfers + Files. Draft v10 explores file selection, image arrangement, conditional PDF protection and queue-first transfers. Native implementation and validation boundaries: docs/toolkit-repairs-2026-10-30.md."
     }
   }
 }

@@ -1,0 +1,40 @@
+Toolkit diagnostic report
+Report: TK-cc898f8648bb
+UTC: 2026-10-30T14:21:42.296158Z
+Operation: download
+Code: ACCESS_DENIED
+App: 0.4.2 (6)
+Engine: 2026.10.26
+Android: 16 / API 36
+Device: Google sdk_gphone64_x86_64
+ABI: x86_64, arm64-v8a
+Network: Wi-Fi; validated=true
+Power saver: false
+Free private storage bytes: 5344653312
+Source: 127.0.0.1
+Requested container: mp4
+Requested height: 1080
+Requested format: automatic
+Requested limitKiB: automatic
+Resolved formats: unknown
+Elapsed ms: 7133
+Last stage: initializing
+Process exit: 1
+HTTP status codes: 403
+Retry events: 0
+Bytes present before attempt: 0
+Last progress ms: not available
+Failure type: com.amaankhan.toolkit.downloads.MediaFailure
+Failure detail: The site refused the media request (403). Resume to refresh the link; if it repeats, update the media engine or try another format. Code: ACCESS_DENIED
+App stack:
+  com.amaankhan.toolkit.downloads.MediaDiagnostics.failure:85
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3$1.invokeSuspend$lambda$2:68
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3$1$$ExternalSyntheticLambda0.invoke:0
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3$1.invokeSuspend:54
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3$1.invoke:8
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3$1.invoke:4
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3.invokeSuspend:45
+  com.amaankhan.toolkit.downloads.MediaProcessKt$runMedia$3.invoke:8
+Recent sanitized engine diagnostics:
++6977ms ERROR: [generic] path?token=[removed]
+No raw source URLs, titles, destination paths, cookies or request headers are intentionally retained. Review before sharing.

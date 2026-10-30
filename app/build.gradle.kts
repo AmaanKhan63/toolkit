@@ -11,8 +11,8 @@ android {
         applicationId = "com.amaankhan.toolkit"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.4.1"
+        versionCode = 6
+        versionName = "0.4.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         providers.gradleProperty("toolkitAbi").orNull?.let { abi ->
             require(abi in setOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")) { "Unsupported toolkitAbi: $abi" }

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toolkit 0.4.2 — native screen review</title>
+<style>
+body{margin:0;background:#101112;color:#e9ece8;font:16px/1.6 system-ui,sans-serif}main{max-width:1400px;margin:auto;padding:32px 24px}h1{font-size:32px;margin:0 0 12px}h2{margin-top:44px}p{max-width:820px;color:#b9bfba}a{color:#b5d6c2}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}figure{margin:0}img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid #383c39}figcaption{padding:12px 0;color:#cbd0cc}nav{display:flex;gap:24px}strong{color:#fff}
+</style>
+<main>
+<h1>Toolkit 0.4.2</h1>
+<p><strong>UI approval pending.</strong> These screens are proposed for your review. Publishing the repair branch does not mark the design approved.</p>
+<p>Actual Android emulator screenshots with synthetic files. These show the implemented screens. Personal photos were not used as test data.</p>
+<nav><a href="#standard">Standard screen</a><a href="#compact">320dp, enlarged text</a></nav>
+<p>Failed media downloads now show a code and report ID with <strong>Save error report</strong>. Older reports remain available in Transfer settings. <a href="sample-error-report.txt">Example exported report from a synthetic HTTP 403 failure</a>.</p>
+<h2 id="standard">Standard screen</h2>
+<div class="grid">
+<figure><img src="standard/images-empty.png" alt="Image selection panel with inline action and three steps"><figcaption>Start with your files</figcaption></figure>
+<figure><img src="standard/images-selected.png" alt="Selected images with expandable page layout"><figcaption>Selected images</figcaption></figure>
+<figure><img src="standard/arrange-images.png" alt="Full-width image arrangement rows"><figcaption>Arrange images</figcaption></figure>
+<figure><img src="standard/protect-unlocked-input.png" alt="Protect form without an unnecessary current-password field"><figcaption>Protect PDF</figcaption></figure>
+<figure><img src="standard/files-top.png" alt="Files with one Open a file action and supported formats"><figcaption>Files and reader</figcaption></figure>
+<figure><img src="standard/transfer-running.png" alt="Running transfer with unknown total size"><figcaption>Transfer progress</figcaption></figure>
+<figure><img src="standard/transfer-failure.png" alt="Transfer recovery actions"><figcaption>Retry and recovery</figcaption></figure>
+</div>
+<h2 id="compact">320dp width, 1.3× font setting</h2>
+<p>Controls can scroll into view; actions wrap rather than compressing labels into narrow columns.</p>
+<div class="grid">
+<figure><img src="compact/arrange-images.png" alt="Image arrangement at 320dp"><figcaption>Arrange images</figcaption></figure>
+<figure><img src="compact/protect-unlocked-input.png" alt="Protect PDF at 320dp"><figcaption>Protect PDF</figcaption></figure>
+<figure><img src="compact/files-top.png" alt="Reader entry at 320dp"><figcaption>Open a file</figcaption></figure>
+<figure><img src="compact/transfer-failure.png" alt="Error code, report ID and Save error report at 320dp"><figcaption>Error report; scroll for recovery actions</figcaption></figure>
+</div>
+<p>See <a href="../../toolkit-repairs-2026-10-30.md">the repair report</a> for test outcomes and remaining YouTube/physical-device validation limits.</p>
+</main></html>

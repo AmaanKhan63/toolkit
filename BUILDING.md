@@ -7,7 +7,7 @@
 3. Choose **app** and an emulator in the device dropdown. **Tools > Device Manager** manages emulators; a connected USB-debugging phone also works.
 4. Press **Run**. Android Studio builds, installs and launches Toolkit. Run again after changes; supported Compose edits can use Live Edit.
 
-No APK download or manual installation is needed for each test. Keep the application installed during updates to preserve settings, history and download staging. See the [capability report](docs/native-toolkit-2026-10-07.md) for tested behavior and rendering limits.
+No APK download or manual installation is needed for each test. Keep the application installed during updates to preserve settings, history and download staging. See the [capability report](docs/native-toolkit-2026-10-07.md) for rendering limits and the [0.4.2 repair report](docs/toolkit-repairs-2026-10-30.md) for changes, validation and the phone artifact.
 
 ## Tooling and command-line builds
 
@@ -38,7 +38,7 @@ adb devices -l
 adb -s YOUR_DEVICE_SERIAL install -r .\app\build\outputs\apk\debug\app-debug.apk
 ```
 
-Identity remains `com.amaankhan.toolkit`, version 0.4.1 / code 5. Keep the same local debug signing key for in-place updates. A production release needs a separately managed release key; no key is committed. Do not uninstall during upgrade tests.
+Identity remains `com.amaankhan.toolkit`, version 0.4.2 / code 6. Keep the same local debug signing key for in-place updates. A production release needs a separately managed release key; no key is committed. Do not uninstall during upgrade tests.
 
 ## Tests
 
@@ -57,21 +57,23 @@ Inspect instrumentation output for OK / FAILURES; ADB's exit code alone is insuf
 adb -s emulator-5556 shell am instrument -w -e liveNetwork true -e class 'com.amaankhan.toolkit.downloads.DownloadEngineTest#optionalLiveSiteInspectionUsesTheActualAppNetworkContext' com.amaankhan.toolkit.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
-This queries a public YouTube test video and can fail if the external site/network changes. **Downloads > Transfer settings > Update yt-dlp** updates the media engine; pause video jobs first.
+This queries a public YouTube test video and can fail if the external site/network changes. **Transfers > Transfer settings > Update yt-dlp** updates the media engine; pause video jobs first.
+
+If media fails, use **Save error report** on the failed transfer or inspection error. Attach the exported text file with a screenshot. **Transfer settings > Recent error reports** retains the latest 20 reports after retrying; they stay private until exported. Reports redact credentials, signed URLs and private paths, and include versions, stage, HTTP/process status and recent diagnostic events. Review before sharing.
 
 Debug builds contain a same-UID document-provider fixture for save failure/recovery tests. It requires Android's signature-level MANAGE_DOCUMENTS permission for other UIDs, has no picker entry, and is absent from release builds.
 
 ## Native walkthrough
 
 - **Settings > Themes:** Platinum, Champagne, Jade; independent System/Light/Dark. **User profile** is a local name/workspace.
-- **Create PDF > Images to PDF:** pick up to 20 images, use Manage to reorder, set numeric linked/separate margins, preview real pages, then Save as.
+- **Create PDF > Images to PDF:** pick up to 500 images, use Manage to reorder or move to a page number, expand Page layout for margins, preview real pages, then Save as. Images are decoded individually; PDF streams use disk scratch storage. JPEG photos are encoded at quality 90 after bounded decoding; PNG uses lossless RGB with transparency flattened on white.
 - **Convert / Organize / Protect / Optimize:** choose inputs/ranges, enter passwords where needed, preview generated content, save a copy. PDF-to-images exports a ZIP or separate images to a selected folder.
 - **Word / Excel / PowerPoint to PDF:** inspect actual generated layout and selected output pages. Local rendering limits appear before conversion.
 - **Workflows:** choose a starting tool or the Excel-to-protected-PDF example, add compatible steps, save a template, enter runtime passwords, preview/save. Batch mode processes separate documents into a ZIP.
-- **Downloads:** Video & audio, Direct link, Telegram or Torrent / magnet. Select a destination folder; torrents expose file selection before transfer. Completed files appear in Files.
+- **Tools > Download tools:** Video & audio, Direct link, Telegram or Torrent / magnet. Track active/completed jobs in **Transfers**, and open saved results in **Files**. Choose Documents or a subfolder as the destination; Android blocks the storage root and main Download folder. Torrents expose file selection before transfer.
 - **Previews:** swipe left/right between PDF pages, exported images, document sections or long-text parts. Zoomed PDF/image drags pan the current page; Fit/100% restores page swiping. Wide tables retain horizontal scrolling.
 - **Forms:** tap outside an input to clear focus and dismiss the keyboard. Input taps, password visibility controls and selection remain interactive.
-- **Files:** PDF or Office/Markdown/text/EPUB/local HTML. PDF has pages, text search and bookmarks; document readers have sections, text sizing/search and fullscreen.
+- **Files > Open a file:** PDF or Office/Markdown/text/EPUB/local HTML, with automatic PDF routing. PDF has pages, text search and bookmarks; document readers have sections, text sizing/search and fullscreen. Access failures offer Retry and Choose another file; reselecting the same document renews the reader session.
 - **Scan:** system camera or existing image, four-corner correction, add/reorder pages and preview PDF.
 
 ## Storage and privacy

@@ -1,0 +1,54 @@
+{
+  "version": "0.4.2",
+  "uiApproval": "awaiting user review",
+  "versionCode": 6,
+  "package": "com.amaankhan.toolkit",
+  "abi": "arm64-v8a",
+  "bytes": 104120073,
+  "sha256": "9f0dd8f0c195b7a2e876638893757cae498f5f8bd0491df5f460fba092b71585",
+  "signingCertificateMatches041": true,
+  "jvm": {
+    "passed": 30
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 68
+  },
+  "nativeBroad": {
+    "reported": 83,
+    "executedPassed": 80,
+    "gatedLiveCases": 3,
+    "failed": 0
+  },
+  "compactUi": {
+    "widthDp": 320,
+    "fontScale": 1.3,
+    "passed": 4
+  },
+  "liveYouTube": {
+    "shortSectionBundledEngine": "passed",
+    "engineUpdate": "2025.11.12 -> 2026.10.26",
+    "shortSectionUpdatedEngine": "180-second test timeout",
+    "productionTransfer": "300-second test timeout",
+    "productionBytes": 51856554,
+    "pastOriginalFailurePointValidated": false,
+    "liveResumeValidated": false,
+    "fullTransferValidated": false
+  },
+  "physicalDeviceTested": false,
+  "report": "../../toolkit-repairs-2026-10-30.md",
+  "diagnosticsNative": {
+    "reported": 13,
+    "executedPassed": 10,
+    "gatedLiveCases": 3,
+    "failed": 0,
+    "coverage": "MediaReliabilityTest and four ToolkitRepairsTest flows; local fixtures only"
+  },
+  "diagnosticsCompactUi": {
+    "passed": 1,
+    "widthDp": 320,
+    "fontScale": 1.3,
+    "seconds": 11.476,
+    "scope": "transfer progress, report action and recovery controls after emulator restart"
+  }
+}
